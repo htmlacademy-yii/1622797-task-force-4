@@ -58,7 +58,8 @@ class Task {
      * @param int $userCurrentId id исполнителя/заказчика
      * @return string|null возвращает статус задания в зависимости от роли пользователя
      */
-    public function getAvailableActions (string $status, int $userCurrentId): ?string {
+    public function getAvailableActions (string $status, int $userCurrentId): ?string
+    {
         if ($status === self::STATUS_NEW && $userCurrentId === $this->customerId) {
             return self::ACTION_CANCEL;
         }
@@ -80,7 +81,7 @@ class Task {
      * @param int $userCurrentId id исполнителя/зазказчика
      * @return string|null возвращает статус задания в зависимости от роли пользователя
      */
-    public function getNextActions (string $action, string $currentStatus, int $userCurrentId): ?string {
+    public function getNextStatus (string $action, string $currentStatus, int $userCurrentId): ?string {
         if ($action === self::ACTION_CANCEL && $currentStatus === self::STATUS_NEW && $userCurrentId === $this->customerId) {
             return self::STATUS_CANCELLED;
         }
