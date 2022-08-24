@@ -19,18 +19,18 @@ class Task {
 
     public int $customerId;
     public int $executorId;
-    public int $status;
+    public string $status;
 
     /** Функция для получения id исполнителя и id заказчика
+     * @param string $status текущий статус задачи
      * @param int $customerId id заказчика
      * @param int $executorId id исполнителя
-     * @param int $status текущий статус задачи
      */
-    public function __construct(int $status, int $customerId, int $executorId)
+    public function __construct(string $status, int $customerId, int $executorId)
     {
+        $this->status = $status;
         $this->customerId = $customerId;
         $this->executorId = $executorId;
-        $this->status = $status;
     }
 
     /** Функция для возврата карты статусов
