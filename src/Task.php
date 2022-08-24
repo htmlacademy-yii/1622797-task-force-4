@@ -10,28 +10,34 @@ class Task {
 
     // Действия над заданием со стороны заказчика
     const ACTION_CANCEL = 'cancel';
-    const ACTION_GET_DONE = 'get done';
+    const ACTION_COMPLETE = 'get done';
 
     // Действия над заданием со стороны исполнителя
+    const ACTION_START = 'start';
     const ACTION_RESPOND = 'respond';
     const ACTION_REFUSE = 'refuse';
 
     public int $customerId;
     public int $executorId;
+    public int $status;
 
     /** Функция для получения id исполнителя и id заказчика
      * @param int $customerId id заказчика
      * @param int $executorId id исполнителя
+     * @param int $status текущий статус задачи
      */
-    public function __construct (int $customerId, int $executorId) {
+    public function __construct(int $status, int $customerId, int $executorId)
+    {
         $this->customerId = $customerId;
         $this->executorId = $executorId;
+        $this->status = $status;
     }
 
     /** Функция для возврата карты статусов
      * @return string[] возвращает массив с названием статусов
      */
-    public function getStatusMap (): array {
+    public function getStatusMap(): array
+    {
         return [
             self::STATUS_NEW => 'Новое',
             self::STATUS_CANCELLED => 'Отменено',
@@ -44,10 +50,12 @@ class Task {
     /** Функция для возврата карты действия
      * @return string[] возвращает массив с названием действий
      */
-    public function getActionMap (): array {
+    public function getActionMap(): array
+    {
         return [
+            self::ACTION_START => 'Начать',
             self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_GET_DONE => 'Выполнено',
+            self::ACTION_COMPLETE => 'Выполнено',
             self::ACTION_RESPOND => 'Откликнуться',
             self::ACTION_REFUSE => 'Отказаться'
         ];
@@ -56,23 +64,28 @@ class Task {
     /** Функция для получения доступных действия для указанного статуса задания
      * @param string $status текущий статус задания
      * @param int $userCurrentId id исполнителя/заказчика
-     * @return string|null возвращает статус задания в зависимости от роли пользователя
+     * @return array возвращает статус задания в зависимости от роли пользователя
      */
-    public function getAvailableActions (string $status, int $userCurrentId): ?string
+    public function getAvailableActions(string $status, int $userCurrentId): array
     {
-        if ($status === self::STATUS_NEW && $userCurrentId === $this->customerId) {
-            return self::ACTION_CANCEL;
+        switch ($status) {
+            case self::STATUS_NEW:
+                if ($userCurrentId === $this->customerId) {
+                    return [self::ACTION_START, self::ACTION_CANCEL];
+                } elseif ($userCurrentId === $this->executorId) {
+                    return [self::ACTION_RESPOND];
+                }
+                break;
+
+            case self::STATUS_AT_WORK:
+                if ($userCurrentId === $this->customerId) {
+                    return [self::ACTION_COMPLETE];
+                } elseif ($userCurrentId === $this->executorId) {
+                    return [self::ACTION_REFUSE];
+                }
+                break;
         }
-        if ($status === self::STATUS_NEW && $userCurrentId === $this->executorId) {
-            return self::ACTION_RESPOND;
-        }
-        if ($status === self::STATUS_AT_WORK && $userCurrentId === $this->customerId) {
-            return self::ACTION_GET_DONE;
-        }
-        if ($status === self::STATUS_AT_WORK && $userCurrentId === $this->executorId) {
-            return self::ACTION_REFUSE;
-        }
-        return null;
+                return [];
     }
 
     /** Функция для получения статуса,в которой он перейдет после выполнения указанного действия
@@ -81,14 +94,15 @@ class Task {
      * @param int $userCurrentId id исполнителя/зазказчика
      * @return string|null возвращает статус задания в зависимости от роли пользователя
      */
-    public function getNextStatus (string $action, string $currentStatus, int $userCurrentId): ?string {
+    public function getNextStatus(string $action, string $currentStatus, int $userCurrentId): ?string
+    {
         if ($action === self::ACTION_CANCEL && $currentStatus === self::STATUS_NEW && $userCurrentId === $this->customerId) {
             return self::STATUS_CANCELLED;
         }
         if ($action === self::ACTION_RESPOND && $currentStatus === self::STATUS_NEW && $userCurrentId === $this->executorId) {
             return self::STATUS_AT_WORK;
         }
-        if ($action === self::ACTION_GET_DONE && $currentStatus === self::STATUS_AT_WORK && $userCurrentId === $this->customerId) {
+        if ($action === self::ACTION_COMPLETE && $currentStatus === self::STATUS_AT_WORK && $userCurrentId === $this->customerId) {
             return self::STATUS_DONE;
         }
         if ($action === self::ACTION_REFUSE && $currentStatus === self::STATUS_AT_WORK && $userCurrentId === $this->executorId) {
