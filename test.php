@@ -22,15 +22,15 @@ assert($strategy1->getNextStatus(Task::ACTION_RESPOND, Task::STATUS_NEW, 2) === 
 assert($strategy1->getNextStatus(Task::ACTION_REFUSE, Task::STATUS_AT_WORK, 2) === Task::STATUS_FAILED);
 assert($strategy1->getNextStatus(Task::ACTION_COMPLETE, Task::STATUS_AT_WORK, 1) === Task::STATUS_DONE);
 
-$strategy2 = new Task('new',2, 3);
+$strategy2 = new Task('new', 2, 3);
 assert($strategy2->getAvailableActions(Task::STATUS_NEW, 1) === [Task::ACTION_COMPLETE, Task::ACTION_CANCEL]);
 assert($strategy2->getAvailableActions(Task::STATUS_NEW, 2) === [Task::ACTION_RESPOND]);
 
-$strategy3 = new Task('new',2, 3);
+$strategy3 = new Task('new', 2, 3);
 assert($strategy3->getAvailableActions(Task::STATUS_AT_WORK, 1) === [Task::ACTION_COMPLETE]);
 assert($strategy3->getAvailableActions(Task::STATUS_AT_WORK, 2) === [Task::ACTION_REFUSE]);
 
-$newTask = new Task('new',2, 3);
+$newTask = new Task('new', 2, 3);
 $mapAction = $newTask->getActionMap();
 $mapStatus = $newTask->getStatusMap();
 
