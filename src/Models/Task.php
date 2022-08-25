@@ -1,21 +1,24 @@
 <?php
 
-class Task {
+namespace Kiipod\Taskforce\Models;
+
+class Task
+{
     // Статусы задания
-    const STATUS_NEW = 'new';
-    const STATUS_CANCELLED = 'cancelled';
-    const STATUS_AT_WORK = 'work';
-    const STATUS_DONE = 'done';
-    const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 'new';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_AT_WORK = 'work';
+    public const STATUS_DONE = 'done';
+    public const STATUS_FAILED = 'failed';
 
     // Действия над заданием со стороны заказчика
-    const ACTION_CANCEL = 'cancel';
-    const ACTION_COMPLETE = 'get done';
+    public const ACTION_CANCEL = 'cancel';
+    public const ACTION_COMPLETE = 'get done';
 
     // Действия над заданием со стороны исполнителя
-    const ACTION_START = 'start';
-    const ACTION_RESPOND = 'respond';
-    const ACTION_REFUSE = 'refuse';
+    public const ACTION_START = 'start';
+    public const ACTION_RESPOND = 'respond';
+    public const ACTION_REFUSE = 'refuse';
 
     public int $customerId;
     public int $executorId;
@@ -85,7 +88,7 @@ class Task {
                 }
                 break;
         }
-                return [];
+        return [];
     }
 
     /** Функция для получения статуса,в которой он перейдет после выполнения указанного действия

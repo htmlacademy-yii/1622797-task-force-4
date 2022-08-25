@@ -1,6 +1,8 @@
 <?php
 
-require_once 'src/Task.php';
+use Kiipod\Taskforce\Models\Task;
+
+require_once __DIR__ . '/vendor/autoload.php';
 
 assert_options(ASSERT_ACTIVE, 1);
 assert_options(ASSERT_WARNING, 0);

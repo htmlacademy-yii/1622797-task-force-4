@@ -1,0 +1,21 @@
+{
+    "name": "kiipod/taskforce",
+    "description": "Online platform for finding performers for one-time tasks",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Kiipod\\Taskforce\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "kiipod",
+            "email": "iamkir90@hotmail.com"
+        }
+    ],
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "friendsofphp/php-cs-fixer": "^3.10"
+    }
+}
