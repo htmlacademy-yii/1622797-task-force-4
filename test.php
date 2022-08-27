@@ -1,6 +1,6 @@
 <?php
 
-use Kiipod\Taskforce\Models\Task;
+use Taskforce\Models\Task;
 
 require_once __DIR__ . '/vendor/autoload.php';
 

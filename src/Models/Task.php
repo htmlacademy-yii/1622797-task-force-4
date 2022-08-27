@@ -1,6 +1,6 @@
 <?php
 
-namespace Kiipod\Taskforce\Models;
+namespace Taskforce\Models;
 
 class Task
 {
