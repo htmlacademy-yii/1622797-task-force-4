@@ -1,6 +1,7 @@
 <?php
 
 namespace Taskforce\Actions;
+namespace Taskforce\Models;
 
 abstract class AbstractAction
 {
@@ -17,5 +18,5 @@ abstract class AbstractAction
         return $this->internalName;
     }
 
-    abstract protected function rightsCheck(int $executorId, int $customerId, int $currentUserId): bool;
+    abstract protected function rightsCheck(Task $task, int $currentUserId): bool;
 }
