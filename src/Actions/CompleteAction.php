@@ -11,10 +11,7 @@ class CompleteAction extends AbstractAction
 
     protected function rightsCheck(Task $task, int $currentUserId): bool
     {
-        if ($task->status === Task::STATUS_NEW && $task->customerId === $currentUserId) {
-            return true;
-        }
-        if ($task->status === Task::STATUS_AT_WORK && $task->executorId === $currentUserId) {
+        if ($task->status === Task::STATUS_AT_WORK && $task->customerId === $currentUserId) {
             return true;
         }
         return false;
