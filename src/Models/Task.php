@@ -2,6 +2,12 @@
 
 namespace Taskforce\Models;
 
+use Taskforce\Actions\StartAction;
+use Taskforce\Actions\CancelAction;
+use Taskforce\Actions\CompleteAction;
+use Taskforce\Actions\RefuseAction;
+use Taskforce\Actions\RespondAction;
+
 class Task
 {
     // Статусы задания
@@ -10,15 +16,6 @@ class Task
     public const STATUS_AT_WORK = 'work';
     public const STATUS_DONE = 'done';
     public const STATUS_FAILED = 'failed';
-
-    // Действия над заданием со стороны заказчика
-    public const ACTION_CANCEL = 'cancel';
-    public const ACTION_COMPLETE = 'get done';
-
-    // Действия над заданием со стороны исполнителя
-    public const ACTION_START = 'start';
-    public const ACTION_RESPOND = 'respond';
-    public const ACTION_REFUSE = 'refuse';
 
     public int $customerId;
     public int $executorId;
@@ -56,11 +53,11 @@ class Task
     public function getActionMap(): array
     {
         return [
-            self::ACTION_START => 'Начать',
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_COMPLETE => 'Выполнено',
-            self::ACTION_RESPOND => 'Откликнуться',
-            self::ACTION_REFUSE => 'Отказаться'
+            StartAction::class => 'Начать',
+            CancelAction::class => 'Отменить',
+            CompleteAction::class => 'Выполнено',
+            RespondAction::class => 'Откликнуться',
+            RefuseAction::class => 'Отказаться'
         ];
     }
 
@@ -74,17 +71,17 @@ class Task
         switch ($status) {
             case self::STATUS_NEW:
                 if ($userCurrentId === $this->customerId) {
-                    return [self::ACTION_START, self::ACTION_CANCEL];
+                    return [new StartAction(), new CancelAction()];
                 } elseif ($userCurrentId === $this->executorId) {
-                    return [self::ACTION_RESPOND];
+                    return [new RespondAction()];
                 }
                 break;
 
             case self::STATUS_AT_WORK:
                 if ($userCurrentId === $this->customerId) {
-                    return [self::ACTION_COMPLETE];
+                    return [new CompleteAction()];
                 } elseif ($userCurrentId === $this->executorId) {
-                    return [self::ACTION_REFUSE];
+                    return [new RefuseAction()];
                 }
                 break;
         }
@@ -93,24 +90,16 @@ class Task
 
     /** Функция для получения статуса,в которой он перейдет после выполнения указанного действия
      * @param string $action текущее действие задания
-     * @param string $currentStatus текущий статус задания
-     * @param int $userCurrentId id исполнителя/зазказчика
-     * @return string|null возвращает статус задания в зависимости от роли пользователя
+     * @return string возвращает статус задания
      */
-    public function getNextStatus(string $action, string $currentStatus, int $userCurrentId): ?string
+    public function getNextStatus(string $action): string
     {
-        if ($action === self::ACTION_CANCEL && $currentStatus === self::STATUS_NEW && $userCurrentId === $this->customerId) {
-            return self::STATUS_CANCELLED;
-        }
-        if ($action === self::ACTION_RESPOND && $currentStatus === self::STATUS_NEW && $userCurrentId === $this->executorId) {
-            return self::STATUS_AT_WORK;
-        }
-        if ($action === self::ACTION_COMPLETE && $currentStatus === self::STATUS_AT_WORK && $userCurrentId === $this->customerId) {
-            return self::STATUS_DONE;
-        }
-        if ($action === self::ACTION_REFUSE && $currentStatus === self::STATUS_AT_WORK && $userCurrentId === $this->executorId) {
-            return self::STATUS_FAILED;
-        }
-        return null;
+        return match ($action) {
+            CancelAction::class => self::STATUS_CANCELLED,
+            RespondAction::class => self::STATUS_AT_WORK,
+            CompleteAction::class => self::STATUS_DONE,
+            RefuseAction::class => self::STATUS_FAILED,
+            StartAction::class => self::STATUS_NEW,
+        };
     }
 }
