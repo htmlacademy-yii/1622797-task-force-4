@@ -1,6 +1,6 @@
 {
     "name": "kiipod/taskforce",
-    "description": "Online platform for finding performers for one-time tasks",
+    "description": "online platform for finding performers for one-time tasks",
     "type": "project",
     "license": "MIT",
     "autoload": {
@@ -16,6 +16,6 @@
     ],
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
-        "friendsofphp/php-cs-fixer": "^3.10"
+        "friendsofphp/php-cs-fixer": "^3.11"
     }
 }
