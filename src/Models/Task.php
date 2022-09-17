@@ -7,6 +7,9 @@ use Taskforce\Actions\CancelAction;
 use Taskforce\Actions\CompleteAction;
 use Taskforce\Actions\RefuseAction;
 use Taskforce\Actions\RespondAction;
+use Taskforce\Exception\ActionException;
+use Taskforce\Exception\StatusException;
+use Taskforce\Exception\ExecutorException;
 
 class Task
 {
@@ -18,19 +21,39 @@ class Task
     public const STATUS_FAILED = 'failed';
 
     public int $customerId;
-    public int $executorId;
+    public ?int $executorId;
     public string $status;
 
     /** Функция для получения id исполнителя и id заказчика
      * @param string $status текущий статус задачи
      * @param int $customerId id заказчика
-     * @param int $executorId id исполнителя
+     * @param int|null $executorId id исполнителя
+     * @throws ExecutorException выбрасывает исключение если неверная роль
+     * @throws StatusException выбрасывает исключение если неверный статус
      */
-    public function __construct(string $status, int $customerId, int $executorId)
+    public function __construct(string $status, int $customerId, ?int $executorId)
     {
+        if ($status === self::STATUS_NEW && $executorId !== null) {
+            throw new StatusException();
+        }
+        if (in_array($status, $this->getStatusesForExecutor(), true) && $executorId === null) {
+            throw new ExecutorException();
+        }
         $this->status = $status;
         $this->customerId = $customerId;
         $this->executorId = $executorId;
+    }
+
+    /** Функция возвращает статусы для исполнителя заданий
+     * @return array возвращает массив с названиями статусов
+     */
+    public function getStatusesForExecutor(): array
+    {
+        return [
+            self::STATUS_AT_WORK,
+            self::STATUS_DONE,
+            self::STATUS_FAILED
+        ];
     }
 
     /** Функция для возврата карты статусов
@@ -91,9 +114,13 @@ class Task
     /** Функция для получения статуса,в которой он перейдет после выполнения указанного действия
      * @param string $action текущее действие задания
      * @return string возвращает статус задания
+     * @throws ActionException выбрасывает исключение если действия не существует
      */
     public function getNextStatus(string $action): string
     {
+        if (!array_key_exists($action, $this->getActionMap())) {
+            throw new ActionException();
+        }
         return match ($action) {
             CancelAction::class => self::STATUS_CANCELLED,
             RespondAction::class => self::STATUS_AT_WORK,
