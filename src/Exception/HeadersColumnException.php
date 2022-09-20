@@ -2,7 +2,7 @@
 
 namespace Taskforce\Exception;
 
-class HeadersColumnException extends AbstractException
+class HeadersColumnException extends BaseException
 {
     protected $message = 'Заданы неверные заголовки столбцов';
 }

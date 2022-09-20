@@ -2,7 +2,7 @@
 
 namespace Taskforce\Exception;
 
-class SourceFileException extends AbstractException
+class SourceFileException extends BaseException
 {
     protected $message = 'Файл не существует';
 }

@@ -2,6 +2,6 @@
 
 namespace Taskforce\Exception;
 
-class AbstractException extends \Exception
+class BaseException extends \Exception
 {
 }

@@ -2,7 +2,7 @@
 
 namespace Taskforce\Exception;
 
-class ActionException extends AbstractException
+class ActionException extends BaseException
 {
     protected $message = 'Неверно выбрано действие';
 }
