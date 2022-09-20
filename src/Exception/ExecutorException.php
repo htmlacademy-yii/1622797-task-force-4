@@ -2,7 +2,7 @@
 
 namespace Taskforce\Exception;
 
-class ExecutorException extends TaskException
+class ExecutorException extends AbstractException
 {
     protected $message = 'Для данного статуса обязательно нужен исполнитель';
 }

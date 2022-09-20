@@ -2,7 +2,7 @@
 
 namespace Taskforce\Exception;
 
-class StatusException extends TaskException
+class StatusException extends AbstractException
 {
     protected $message = 'Неверный статус задания';
 }
