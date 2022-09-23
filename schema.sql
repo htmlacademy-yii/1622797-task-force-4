@@ -6,13 +6,13 @@ CREATE TABLE cities (
   id int AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
   latitude DECIMAL(11, 8) NOT NULL,
-  longtitude DECIMAL(11, 8) NOT NULL
+  longitude DECIMAL(11, 8) NOT NULL
 );
 
 /* Таблица категорий заданий */
 CREATE TABLE categories (
   id int AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name VARCHAR(128) NOT NULL,
   icon VARCHAR (20)
 );
 
@@ -33,9 +33,8 @@ CREATE TABLE users (
   bio TEXT,
   orders_num int DEFAULT 0,
   status TINYINT UNSIGNED NOT NULL,
-  is_executor BOOL NOT NULL,
-  FOREIGN KEY (category_id) REFERENCES categories (id),
-  FOREIGN KEY (avatar_file) REFERENCES files (id),
+  is_executor BOOLEAN NOT NULL,
+  FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)
 );
 

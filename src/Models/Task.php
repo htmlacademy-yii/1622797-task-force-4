@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Taskforce\Models;
 
 use Taskforce\Actions\StartAction;
@@ -24,7 +26,7 @@ class Task
     public ?int $executorId;
     public string $status;
 
-    /** Функция для получения id исполнителя и id заказчика
+    /** Функция для получения id исполнителя, id заказчика и текущего статуса
      * @param string $status текущий статус задачи
      * @param int $customerId id заказчика
      * @param int|null $executorId id исполнителя
