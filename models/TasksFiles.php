@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "tasks_files".
  *
@@ -32,9 +30,9 @@ class TasksFiles extends \yii\db\ActiveRecord
         return [
             [['task_id', 'file_id'], 'required'],
             [['task_id', 'file_id'], 'integer'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class(),
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class,
                 'targetAttribute' => ['task_id' => 'id']],
-            [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class(),
+            [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class,
                 'targetAttribute' => ['file_id' => 'id']],
         ];
     }
@@ -58,7 +56,7 @@ class TasksFiles extends \yii\db\ActiveRecord
      */
     public function getFile()
     {
-        return $this->hasOne(Files::class(), ['id' => 'file_id']);
+        return $this->hasOne(Files::class, ['id' => 'file_id']);
     }
 
     /**
@@ -68,6 +66,6 @@ class TasksFiles extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Tasks::class(), ['id' => 'task_id']);
+        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }
 }

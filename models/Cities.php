@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "cities".
  *
@@ -57,7 +55,7 @@ class Cities extends \yii\db\ActiveRecord
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::class(), ['city_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['city_id' => 'id']);
     }
 
     /**
@@ -67,6 +65,6 @@ class Cities extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(Users::class(), ['city_id' => 'id']);
+        return $this->hasMany(Users::class, ['city_id' => 'id']);
     }
 }

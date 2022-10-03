@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "executor_category".
  *
@@ -31,9 +29,9 @@ class ExecutorCategory extends \yii\db\ActiveRecord
         return [
             [['category_id', 'user_id'], 'required'],
             [['category_id', 'user_id'], 'integer'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class(),
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
                 'targetAttribute' => ['user_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class(),
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
@@ -56,7 +54,7 @@ class ExecutorCategory extends \yii\db\ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(Categories::class(), ['id' => 'category_id']);
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**
@@ -66,6 +64,6 @@ class ExecutorCategory extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(Users::class(), ['id' => 'user_id']);
+        return $this->hasOne(Users::class, ['id' => 'user_id']);
     }
 }

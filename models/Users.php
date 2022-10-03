@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "users".
  *
@@ -57,9 +55,9 @@ class Users extends \yii\db\ActiveRecord
             [['password', 'telegram'], 'string', 'max' => 64],
             [['phone'], 'string', 'max' => 32],
             [['email'], 'unique'],
-            [['avatar_file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class(),
+            [['avatar_file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class,
                 'targetAttribute' => ['avatar_file_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class(),
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id']],
         ];
     }
@@ -96,7 +94,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getAvatarFile()
     {
-        return $this->hasOne(Files::class(), ['id' => 'avatar_file_id']);
+        return $this->hasOne(Files::class, ['id' => 'avatar_file_id']);
     }
 
     /**
@@ -106,7 +104,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(Cities::class(), ['id' => 'city_id']);
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
 
     /**
@@ -116,7 +114,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getExecutorCategories()
     {
-        return $this->hasMany(ExecutorCategory::class(), ['user_id' => 'id']);
+        return $this->hasMany(ExecutorCategory::class, ['user_id' => 'id']);
     }
 
     /**
@@ -126,7 +124,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getFeedbacks()
     {
-        return $this->hasMany(Feedback::class(), ['customer_id' => 'id']);
+        return $this->hasMany(Feedback::class, ['customer_id' => 'id']);
     }
 
     /**
@@ -136,7 +134,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getFeedbacks0()
     {
-        return $this->hasMany(Feedback::class(), ['executor_id' => 'id']);
+        return $this->hasMany(Feedback::class, ['executor_id' => 'id']);
     }
 
     /**
@@ -146,7 +144,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getResponses()
     {
-        return $this->hasMany(Response::class(), ['executor_id' => 'id']);
+        return $this->hasMany(Response::class, ['executor_id' => 'id']);
     }
 
     /**
@@ -156,7 +154,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::class(), ['customer_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['customer_id' => 'id']);
     }
 
     /**
@@ -166,6 +164,6 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getTasks0()
     {
-        return $this->hasMany(Tasks::class(), ['executor_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['executor_id' => 'id']);
     }
 }

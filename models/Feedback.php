@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "feedback".
  *
@@ -39,11 +37,11 @@ class Feedback extends \yii\db\ActiveRecord
             [['customer_id', 'executor_id', 'task_id', 'rating'], 'integer'],
             [['date_creation'], 'safe'],
             [['description'], 'string'],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class(),
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
                 'targetAttribute' => ['customer_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class(),
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id']],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class(),
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class,
                 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
@@ -71,7 +69,7 @@ class Feedback extends \yii\db\ActiveRecord
      */
     public function getCustomer()
     {
-        return $this->hasOne(Users::class(), ['id' => 'customer_id']);
+        return $this->hasOne(Users::class, ['id' => 'customer_id']);
     }
 
     /**
@@ -81,7 +79,7 @@ class Feedback extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(Users::class(), ['id' => 'executor_id']);
+        return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -91,6 +89,6 @@ class Feedback extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Tasks::class(), ['id' => 'task_id']);
+        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }
 }

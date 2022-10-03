@@ -56,7 +56,7 @@ CREATE TABLE tasks (
   category_id int NOT NULL,
   customer_id int NOT NULL,
   executor_id int,
-  status TINYINT NOT NULL,
+  status TINYTEXT DEFAULT new,
   budget int NOT NULL,
   period_execution DATETIME NOT NULL,
   FOREIGN KEY (customer_id) REFERENCES users (id),

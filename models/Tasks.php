@@ -2,7 +2,7 @@
 
 namespace app\models;
 
-use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "tasks".
@@ -15,7 +15,7 @@ use Yii;
  * @property int $category_id
  * @property int $customer_id
  * @property int|null $executor_id
- * @property int $status
+ * @property string $status
  * @property int $budget
  * @property string $period_execution
  *
@@ -29,6 +29,12 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
+    public const STATUS_NEW = 'new';
+    public const STATUS_CANCELLED = 'cancelled';
+    public const STATUS_AT_WORK = 'work';
+    public const STATUS_DONE = 'done';
+    public const STATUS_FAILED = 'failed';
+
     /**
      * {@inheritdoc}
      */
@@ -48,13 +54,13 @@ class Tasks extends \yii\db\ActiveRecord
             [['city_id', 'category_id', 'customer_id', 'executor_id', 'status', 'budget'], 'integer'],
             [['date_creation', 'period_execution'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class(),
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
                 'targetAttribute' => ['customer_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class(),
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class(),
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class(),
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id']],
         ];
     }
@@ -84,9 +90,9 @@ class Tasks extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): ActiveQuery
     {
-        return $this->hasOne(Categories::class(), ['id' => 'category_id']);
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**
@@ -96,7 +102,7 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(Cities::class(), ['id' => 'city_id']);
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
 
     /**
@@ -106,7 +112,7 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getCustomer()
     {
-        return $this->hasOne(Users::class(), ['id' => 'customer_id']);
+        return $this->hasOne(Users::class, ['id' => 'customer_id']);
     }
 
     /**
@@ -116,7 +122,7 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(Users::class(), ['id' => 'executor_id']);
+        return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -126,7 +132,7 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getFeedbacks()
     {
-        return $this->hasMany(Feedback::class(), ['task_id' => 'id']);
+        return $this->hasMany(Feedback::class, ['task_id' => 'id']);
     }
 
     /**
@@ -136,7 +142,7 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getResponses()
     {
-        return $this->hasMany(Response::class(), ['task_id' => 'id']);
+        return $this->hasMany(Response::class, ['task_id' => 'id']);
     }
 
     /**
@@ -146,6 +152,6 @@ class Tasks extends \yii\db\ActiveRecord
      */
     public function getTasksFiles()
     {
-        return $this->hasMany(TasksFiles::class(), ['task_id' => 'id']);
+        return $this->hasMany(TasksFiles::class, ['task_id' => 'id']);
     }
 }
