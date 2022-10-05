@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "files".
  *
@@ -53,7 +51,7 @@ class Files extends \yii\db\ActiveRecord
      */
     public function getTasksFiles()
     {
-        return $this->hasMany(TasksFiles::class(), ['file_id' => 'id']);
+        return $this->hasMany(TasksFiles::class, ['file_id' => 'id']);
     }
 
     /**
@@ -63,6 +61,6 @@ class Files extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(Users::class(), ['avatar_file_id' => 'id']);
+        return $this->hasMany(Users::class, ['avatar_file_id' => 'id']);
     }
 }
