@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
+use Yii;
 use yii\web\Controller;
 use yii\data\ActiveDataProvider;
-use app\models\Tasks;
+use app\models\forms\TaskFilterForm;
 
 class TasksController extends Controller
 {
@@ -13,15 +14,20 @@ class TasksController extends Controller
      */
     public function actionIndex(): string
     {
-        $taskList = Tasks::find()
-            ->where(['status' => Tasks::STATUS_NEW])
-            ->with('category')
-            ->with('city');
+        $taskFilterForm = new TaskFilterForm();
+        $taskQuery = $taskFilterForm->getNewTaskQuery();
+
+        if (Yii::$app->request->getIsPost()) {
+            if ($taskFilterForm->load(Yii::$app->request->post())) {
+                $taskQuery = $taskFilterForm->getFilteredTasks();
+            }
+        }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $taskList,
+            'query' => $taskQuery,
             'pagination' => [
                 'pageSize' => 5,
+                'pageSizeParam' => false
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -30,6 +36,8 @@ class TasksController extends Controller
             ],
         ]);
 
-        return $this->render('index', ['dataProvider' => $dataProvider]);
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+            'taskFilterForm' => $taskFilterForm]);
     }
 }
