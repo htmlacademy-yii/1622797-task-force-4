@@ -17,8 +17,8 @@ class TasksController extends Controller
         $taskFilterForm = new TaskFilterForm();
         $taskQuery = $taskFilterForm->getNewTaskQuery();
 
-        if (Yii::$app->request->getIsPost()) {
-            if ($taskFilterForm->load(Yii::$app->request->post())) {
+        if (Yii::$app->request->getIsGet()) {
+            if ($taskFilterForm->load(Yii::$app->request->get())) {
                 $taskQuery = $taskFilterForm->getFilteredTasks();
             }
         }
