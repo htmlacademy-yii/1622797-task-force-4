@@ -32,7 +32,7 @@ CREATE TABLE users (
   telegram VARCHAR(64),
   bio TEXT,
   orders_num int DEFAULT 0,
-  status TINYINT UNSIGNED NOT NULL,
+  status TINYTEXT NOT NULL,
   is_executor BOOLEAN NOT NULL,
   FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)

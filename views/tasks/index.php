@@ -2,11 +2,18 @@
 
 /** @var yii\web\View $this
  * @var object $dataProvider
+ * @var object $taskFilterForm
  */
 
 use yii\widgets\ListView;
+use yii\widgets\ActiveForm;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
+use app\models\Categories;
+use app\models\forms\TaskFilterForm;
 
 $this->title = 'Новые задания';
+$categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 ?>
 
 <div class="left-column">
@@ -37,38 +44,54 @@ $this->title = 'Новые задания';
 <div class="right-column">
     <div class="right-card black">
         <div class="search-form">
-            <form>
-                <h4 class="head-card">Категории</h4>
-                <div class="form-group">
-                    <div class="checkbox-wrapper">
-                        <label class="control-label" for="сourier-services">
-                            <input type="checkbox" id="сourier-services" checked>
-                            Курьерские услуги</label>
-                        <label class="control-label" for="cargo-transportation">
-                            <input id="cargo-transportation" type="checkbox">
-                            Грузоперевозки</label>
-                        <label class="control-label" for="translations">
-                            <input id="translations" type="checkbox">
-                            Переводы</label>
-                    </div>
-                </div>
-                <h4 class="head-card">Дополнительно</h4>
-                <div class="form-group">
-                    <label class="control-label" for="without-performer">
-                        <input id="without-performer" type="checkbox" checked>
-                        Без исполнителя</label>
-                </div>
-                <h4 class="head-card">Период</h4>
-                <div class="form-group">
-                    <label for="period-value"></label>
-                    <select id="period-value">
-                        <option>1 час</option>
-                        <option>12 часов</option>
-                        <option>24 часа</option>
-                    </select>
-                </div>
-                <input type="submit" class="button button--blue" value="Искать">
-            </form>
+            <?php $form = ActiveForm::begin([
+                'method' => 'get',
+                'fieldConfig' => [
+                    'template' => "{input}",
+                ],
+            ]); ?>
+            <?= Html::tag('h4', 'Категории', ['class' => 'head-card']); ?>
+            <?= $form->field($taskFilterForm, 'category')
+            ->checkboxList(
+                $categoryItems,
+                [
+                    'class' => 'checkbox-wrapper',
+                    'itemOptions' => [
+                        'labelOptions' => ['class' => 'control-label']
+                    ]
+                ]
+            ); ?>
+
+            <?= Html::tag('h4', 'Дополнительно', ['class' => 'head-card']); ?>
+            <?= $form->field($taskFilterForm, 'remoteTask')
+                ->checkbox(
+                    [
+                        'id' => 'remoteTask',
+                        'labelOptions' => ['class' => 'control-label']
+                    ]
+                ); ?>
+            <?= $form->field($taskFilterForm, 'withoutExecutor')
+                ->checkbox(
+                    [
+                        'id' => 'withoutExecutor',
+                        'labelOptions' => ['class' => 'control-label']
+                    ]
+                ); ?>
+
+            <?= Html::tag('h4', 'Период', ['class' => 'head-card']); ?>
+            <?= $form->field($taskFilterForm, 'period', [
+                'template' => "{label}\n{input}",
+                'labelOptions' => [
+                    'for' => 'period-value'],
+                'inputOptions' => ['id' => 'period-value']
+
+            ])
+                ->dropDownList(TaskFilterForm::getPeriodValue(), [
+                ])->label(false); ?>
+
+                <?= Html::SubmitInput('Искать', ['class' => 'button button--blue'])?>
+
+            <?php ActiveForm::end() ?>
         </div>
     </div>
 </div>

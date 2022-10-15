@@ -3,10 +3,10 @@
 /** @var yii\web\View $this */
 /** @var string $content */
 
-use app\assets\AppAsset;
+use app\assets\MainAsset;
 use yii\bootstrap5\Html;
 
-AppAsset::register($this);
+MainAsset::register($this);
 
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
@@ -20,7 +20,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 <html lang="<?= Yii::$app->language ?>">
 <head>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="stylesheet" href="css/style.css">
+    <?php $this->head() ?>
 </head>
 
 <body>
@@ -29,7 +29,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 <header class="page-header">
     <nav class="main-nav">
         <a href='#' class="header-logo">
-            <img class="logo-image" src="img/logotype.png" width=227 height=60 alt="taskforce">
+            <img class="logo-image" src="/img/logotype.png" width=227 height=60 alt="taskforce">
         </a>
         <div class="nav-wrapper">
             <ul class="nav-list">
@@ -50,7 +50,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
     </nav>
     <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="img/man-glasses.png" width="55" height="55" alt="Аватар">
+            <img class="user-photo" src="/img/man-glasses.png" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
             <p class="user-name">Василий</p>
