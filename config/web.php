@@ -8,6 +8,7 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'language' => 'ru-RU',
+    'timeZone' => 'Europe/Moscow',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -47,7 +48,9 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'tasks/page=<page:\d+>' => 'tasks/index'
+                'tasks/page=<page:\d+>' => 'tasks/index',
+                'tasks/view/<id:\d+>' => 'tasks/view',
+                'user/view/<id:\d+>' => 'user/view'
             ],
         ],
     ],
