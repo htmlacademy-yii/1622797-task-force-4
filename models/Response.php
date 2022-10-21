@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "response".
  *
@@ -11,17 +14,17 @@ namespace app\models;
  * @property int $executor_id
  * @property int|null $price
  * @property string|null $comment
- * @property int|null $refuse
+ * @property string|null $refuse
  *
  * @property Users $executor
  * @property Tasks $task
  */
-class Response extends \yii\db\ActiveRecord
+class Response extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'response';
     }
@@ -29,7 +32,7 @@ class Response extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['date_creation'], 'safe'],
@@ -46,7 +49,7 @@ class Response extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -62,9 +65,9 @@ class Response extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Executor]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getExecutor()
+    public function getExecutor(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
@@ -72,9 +75,9 @@ class Response extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Task]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }

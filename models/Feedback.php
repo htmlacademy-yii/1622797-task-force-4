@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "feedback".
  *
@@ -11,18 +14,18 @@ namespace app\models;
  * @property int $task_id
  * @property string $date_creation
  * @property string $description
- * @property int $rating
+ * @property int $grade
  *
  * @property Users $customer
  * @property Users $executor
  * @property Tasks $task
  */
-class Feedback extends \yii\db\ActiveRecord
+class Feedback extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'feedback';
     }
@@ -30,11 +33,11 @@ class Feedback extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
-            [['customer_id', 'executor_id', 'task_id', 'description', 'rating'], 'required'],
-            [['customer_id', 'executor_id', 'task_id', 'rating'], 'integer'],
+            [['customer_id', 'executor_id', 'task_id', 'description', 'grade'], 'required'],
+            [['customer_id', 'executor_id', 'task_id', 'grade'], 'integer'],
             [['date_creation'], 'safe'],
             [['description'], 'string'],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
@@ -49,7 +52,7 @@ class Feedback extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -58,16 +61,16 @@ class Feedback extends \yii\db\ActiveRecord
             'task_id' => 'Task ID',
             'date_creation' => 'Date Creation',
             'description' => 'Description',
-            'rating' => 'Rating',
+            'grade' => 'Grade',
         ];
     }
 
     /**
      * Gets query for [[Customer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'customer_id']);
     }
@@ -75,9 +78,9 @@ class Feedback extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Executor]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getExecutor()
+    public function getExecutor(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
@@ -85,9 +88,9 @@ class Feedback extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Task]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTask()
+    public function getTask(): ActiveQuery
     {
         return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }

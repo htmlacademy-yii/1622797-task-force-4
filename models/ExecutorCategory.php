@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "executor_category".
  *
@@ -11,20 +14,20 @@ namespace app\models;
  * @property Categories $category
  * @property Users $user
  */
-class ExecutorCategory extends \yii\db\ActiveRecord
+class ExecutorCategory extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
-        return 'executor_category';
+        return 'executorCategory';
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['category_id', 'user_id'], 'required'],
@@ -39,7 +42,7 @@ class ExecutorCategory extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'category_id' => 'Category ID',
@@ -50,9 +53,9 @@ class ExecutorCategory extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): ActiveQuery
     {
         return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
@@ -60,9 +63,9 @@ class ExecutorCategory extends \yii\db\ActiveRecord
     /**
      * Gets query for [[User]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUser()
+    public function getUser(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'user_id']);
     }

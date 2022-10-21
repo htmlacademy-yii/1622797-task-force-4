@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "cities".
  *
@@ -13,12 +16,12 @@ namespace app\models;
  * @property Tasks[] $tasks
  * @property Users[] $users
  */
-class Cities extends \yii\db\ActiveRecord
+class Cities extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'cities';
     }
@@ -26,7 +29,7 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'latitude', 'longitude'], 'required'],
@@ -38,7 +41,7 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -51,9 +54,9 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTasks()
+    public function getTasks(): ActiveQuery
     {
         return $this->hasMany(Tasks::class, ['city_id' => 'id']);
     }
@@ -61,9 +64,9 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Users]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getUsers()
+    public function getUsers(): ActiveQuery
     {
         return $this->hasMany(Users::class, ['city_id' => 'id']);
     }
