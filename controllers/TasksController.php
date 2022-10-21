@@ -5,7 +5,9 @@ namespace app\controllers;
 use Yii;
 use yii\web\Controller;
 use yii\data\ActiveDataProvider;
+use yii\web\NotFoundHttpException;
 use app\models\forms\TaskFilterForm;
+use app\models\Tasks;
 
 class TasksController extends Controller
 {
@@ -39,5 +41,17 @@ class TasksController extends Controller
         return $this->render('index', [
             'dataProvider' => $dataProvider,
             'taskFilterForm' => $taskFilterForm]);
+    }
+
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView($id): string
+    {
+        $task = Tasks::findOne($id);
+        if (!$task) {
+            throw new NotFoundHttpException("Задания с ID $id не сущесвует");
+        }
+        return $this->render('view', ['task' => $task]);
     }
 }

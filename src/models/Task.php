@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Taskforce\Models;
+namespace taskforce\models;
 
-use Taskforce\Actions\StartAction;
-use Taskforce\Actions\CancelAction;
-use Taskforce\Actions\CompleteAction;
-use Taskforce\Actions\RefuseAction;
-use Taskforce\Actions\RespondAction;
-use Taskforce\Exception\ActionException;
-use Taskforce\Exception\StatusException;
-use Taskforce\Exception\ExecutorException;
+use taskforce\actions\StartAction;
+use taskforce\actions\CancelAction;
+use taskforce\actions\CompleteAction;
+use taskforce\actions\RefuseAction;
+use taskforce\actions\RespondAction;
+use taskforce\exception\ActionException;
+use taskforce\exception\StatusException;
+use taskforce\exception\ExecutorException;
 
 class Task
 {

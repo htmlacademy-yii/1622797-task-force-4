@@ -15,9 +15,9 @@ return [
         Users::find()->select(['id'])->asArray()->indexBy(['id'])->where(['is_executor' => true])->all()
     )),
     'task_id' => $faker->randomElement(array_keys(
-        Tasks::find()->select(['id'])->asArray()->indexBy(['id'])->all()
+        Tasks::find()->select(['id'])->asArray()->indexBy(['id'])->where(['is_executor' => false])->all()
     )),
     'date_creation' => date('Y.m.d H:i:s', $faker->dateTimeThisYear->getTimestamp()),
     'description' => $faker->text,
-    'rating' => $faker->numberBetween(0, 5)
+    'rating' => $faker->randomFloat(2, 0, 5)
 ];

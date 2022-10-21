@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Taskforce\DataConverter;
+namespace taskforce\dataConverter;
 
 use SplFileObject;
 use RuntimeException;
-use Taskforce\Exception\SourceFileException;
-use Taskforce\Exception\FileFormatException;
-use Taskforce\Exception\HeadersColumnException;
-use Taskforce\Exception\RequireColumnsException;
+use taskforce\exception\SourceFileException;
+use taskforce\exception\FileFormatException;
+use taskforce\exception\HeadersColumnException;
+use taskforce\exception\RequireColumnsException;
 
 class DataConverter
 {

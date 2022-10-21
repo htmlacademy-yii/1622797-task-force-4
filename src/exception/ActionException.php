@@ -1,6 +1,6 @@
 <?php
 
-namespace Taskforce\Exception;
+namespace taskforce\exception;
 
 class ActionException extends BaseException
 {

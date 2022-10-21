@@ -25,13 +25,12 @@ CREATE TABLE users (
   city_id int NOT NULL,
   date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   rating TINYINT DEFAULT 0,
-  popularity int DEFAULT 0,
+  grade FLOAT DEFAULT 0,
   avatar_file_id int NULL,
   birthday DATETIME,
   phone VARCHAR(32),
   telegram VARCHAR(64),
   bio TEXT,
-  orders_num int DEFAULT 0,
   status TINYTEXT NOT NULL,
   is_executor BOOLEAN NOT NULL,
   FOREIGN KEY (avatar_file_id) REFERENCES files (id),
@@ -39,7 +38,7 @@ CREATE TABLE users (
 );
 
 /* Таблца связывающая исполнителя и категории */
-CREATE TABLE executor_category (
+CREATE TABLE executorCategory (
   category_id int NOT NULL,
   user_id int NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users (id),
@@ -72,7 +71,7 @@ CREATE TABLE files (
 );
 
 /* Таблица файлов задач */
-CREATE TABLE tasks_files (
+CREATE TABLE tasksFiles (
   id int AUTO_INCREMENT PRIMARY KEY,
   task_id int NOT NULL,
   file_id int NOT NULL,
@@ -88,7 +87,7 @@ CREATE TABLE feedback (
   task_id int NOT NULL,
   date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   description TEXT NOT NULL,
-  rating TINYINT NOT NULL,
+  grade TINYINT NOT NULL,
   FOREIGN KEY (customer_id) REFERENCES users (id),
   FOREIGN KEY (executor_id) REFERENCES users (id),
   FOREIGN KEY (task_id) REFERENCES tasks (id)
@@ -102,7 +101,7 @@ CREATE TABLE response (
   executor_id int NOT NULL,
   price int,
   comment TEXT,
-  refuse TINYINT,
+  refuse TINYTEXT,
   FOREIGN KEY (executor_id) REFERENCES users (id),
   FOREIGN KEY (task_id) REFERENCES tasks (id)
 );

@@ -3,6 +3,7 @@
 namespace app\models;
 
 use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "tasks".
@@ -27,7 +28,7 @@ use yii\db\ActiveQuery;
  * @property Response[] $responses
  * @property TasksFiles[] $tasksFiles
  */
-class Tasks extends \yii\db\ActiveRecord
+class Tasks extends ActiveRecord
 {
     public const STATUS_NEW = 'new';
     public const STATUS_CANCELLED = 'cancelled';
@@ -38,7 +39,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'tasks';
     }
@@ -46,7 +47,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['name', 'category_id', 'customer_id', 'status', 'budget', 'period_execution'], 'required'],
@@ -68,7 +69,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
@@ -88,7 +89,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategory(): ActiveQuery
     {
@@ -98,9 +99,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCity()
+    public function getCity(): ActiveQuery
     {
         return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
@@ -108,9 +109,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Customer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCustomer()
+    public function getCustomer(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'customer_id']);
     }
@@ -118,9 +119,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Executor]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getExecutor()
+    public function getExecutor(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
@@ -128,9 +129,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Feedbacks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getFeedbacks()
+    public function getFeedbacks(): ActiveQuery
     {
         return $this->hasMany(Feedback::class, ['task_id' => 'id']);
     }
@@ -138,9 +139,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getResponses()
+    public function getResponses(): ActiveQuery
     {
         return $this->hasMany(Response::class, ['task_id' => 'id']);
     }
@@ -148,10 +149,34 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[TasksFiles]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getTasksFiles()
+    public function getTasksFiles(): ActiveQuery
     {
         return $this->hasMany(TasksFiles::class, ['task_id' => 'id']);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getTaskStatusesList(): array
+    {
+        return
+            [
+                self::STATUS_NEW => 'Задание опубликовано, исполнитель ещё не найден',
+                self::STATUS_CANCELLED => 'Заказчик отменил задание',
+                self::STATUS_AT_WORK => 'Заказчик выбрал исполнителя для задания',
+                self::STATUS_DONE => 'Заказчик отметил задание как выполненное',
+                self::STATUS_FAILED => 'Исполнитель отказался от выполнения задания'
+            ];
+    }
+
+    /**
+     * @return string
+     */
+    public function getStatusName(): string
+    {
+        $statusList = $this->getTaskStatusesList();
+        return $statusList[$this->status];
     }
 }

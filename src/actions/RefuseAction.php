@@ -1,8 +1,8 @@
 <?php
 
-namespace Taskforce\Actions;
+namespace taskforce\actions;
 
-use Taskforce\Models\Task;
+use taskforce\models\Task;
 
 class RefuseAction extends AbstractAction
 {
