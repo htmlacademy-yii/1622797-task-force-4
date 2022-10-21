@@ -15,16 +15,16 @@ $this->registerMetaTag(['name' => 'description', 'content' => $this->params['met
 $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 ?>
 
-<?php $this->beginPage() ?>
+<?php $this->beginPage(); ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="<?= Yii::$app->language; ?>">
 <head>
-    <title><?= Html::encode($this->title) ?></title>
-    <?php $this->head() ?>
+    <title><?= Html::encode($this->title); ?></title>
+    <?php $this->head(); ?>
 </head>
 
 <body>
-<?php $this->beginBody() ?>
+<?php $this->beginBody(); ?>
 
 <header class="page-header">
     <nav class="main-nav">
@@ -74,11 +74,11 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 
 <main class="main-content container">
 
-    <?= $content ?>
+    <?= $content; ?>
 
 </main>
 
-<?php $this->endBody() ?>
+<?php $this->endBody(); ?>
 </body>
 </html>
-<?php $this->endPage() ?>
+<?php $this->endPage(); ?>

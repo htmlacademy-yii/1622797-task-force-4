@@ -1,13 +1,13 @@
 <?php
 
-namespace Taskforce\Actions;
+namespace Taskforce\actions;
 
-use Taskforce\Models\Task;
+use Taskforce\models\Task;
 
-class StartAction extends AbstractAction
+class CancelAction extends AbstractAction
 {
-    protected string $name = 'Начать';
-    protected string $internalName = 'ACTION_START';
+    protected string $name = 'Отменить';
+    protected string $internalName = 'ACTION_CANCEL';
 
     protected function rightsCheck(Task $task, int $currentUserId): bool
     {

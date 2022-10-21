@@ -1,8 +1,8 @@
 <?php
 
-namespace Taskforce\Actions;
+namespace Taskforce\actions;
 
-use Taskforce\Models\Task;
+use Taskforce\models\Task;
 
 class RespondAction extends AbstractAction
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Taskforce\Exception;
+namespace Taskforce\exception;
 
 class BaseException extends \Exception
 {

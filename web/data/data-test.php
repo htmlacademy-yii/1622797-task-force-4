@@ -1,6 +1,6 @@
 <?php
 
-use Taskforce\DataConverter\DataConverter;
+use Taskforce\dataConverter\DataConverter;
 
 require_once __DIR__ . '/vendor/autoload.php';
 
