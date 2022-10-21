@@ -8,7 +8,6 @@ use app\models\Tasks;
  * @var $index integer
  */
 return [
-    'creation_date' => date('Y.m.d H:i:s', $faker->dateTimeThisYear->getTimestamp()),
     'task_id' => $faker->randomElement(array_keys(
         Tasks::find()->select(['id'])->asArray()->indexBy(['id'])->all()
     )),
