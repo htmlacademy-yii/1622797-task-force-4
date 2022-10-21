@@ -1,6 +1,6 @@
 <?php
 
-namespace Taskforce\helpers;
+namespace taskforce\helpers;
 
 class MainHelpers
 {

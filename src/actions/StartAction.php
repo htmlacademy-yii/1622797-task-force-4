@@ -1,8 +1,8 @@
 <?php
 
-namespace Taskforce\actions;
+namespace taskforce\actions;
 
-use Taskforce\models\Task;
+use taskforce\models\Task;
 
 class StartAction extends AbstractAction
 {
