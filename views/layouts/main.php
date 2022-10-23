@@ -31,6 +31,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
         <a href='#' class="header-logo">
             <img class="logo-image" src="/img/logotype.png" width=227 height=60 alt="taskforce">
         </a>
+        <?php if (!Yii::$app->user->isGuest) : ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
@@ -47,7 +48,9 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
                 </li>
             </ul>
         </div>
+        <?php endif; ?>
     </nav>
+    <?php if (!Yii::$app->user->isGuest) : ?>
     <div class="user-block">
         <a href="#">
             <img class="user-photo" src="/img/man-glasses.png" width="55" height="55" alt="Аватар">
@@ -70,6 +73,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </header>
 
 <main class="main-content container">
