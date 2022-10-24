@@ -56,10 +56,10 @@ class Users extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'email', 'password', 'city_id', 'status', 'is_executor'], 'required'],
-            [['city_id', 'rating', 'grade', 'avatar_file_id', 'status', 'is_executor'], 'integer'],
+            [['name', 'email', 'password', 'city_id', 'is_executor'], 'required'],
+            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor'], 'integer'],
             [['date_creation', 'birthday'], 'safe'],
-            [['bio'], 'string'],
+            [['bio', 'status'], 'string'],
             [['name', 'email'], 'string', 'max' => 255],
             [['password', 'telegram'], 'string', 'max' => 64],
             [['phone'], 'string', 'max' => 32],

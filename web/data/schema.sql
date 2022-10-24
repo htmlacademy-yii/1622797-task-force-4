@@ -31,7 +31,7 @@ CREATE TABLE users (
   phone VARCHAR(32),
   telegram VARCHAR(64),
   bio TEXT,
-  status TINYTEXT NOT NULL,
+  status TINYTEXT,
   is_executor BOOLEAN NOT NULL,
   FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)
