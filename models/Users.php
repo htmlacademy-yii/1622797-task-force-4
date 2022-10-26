@@ -7,6 +7,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use DateTime;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
@@ -36,7 +37,7 @@ use DateTime;
  * @property Tasks[] $tasks
  * @property Tasks[] $tasks0
  */
-class Users extends ActiveRecord
+class Users extends ActiveRecord implements IdentityInterface
 {
     // Статусы Исполнителя
     private const STATUS_BUSY = 'Занят';
@@ -275,5 +276,39 @@ class Users extends ActiveRecord
         }
 
         return floatval($gradeSum / ($feedbackCount + $failedTasks));
+    }
+
+    /** Метод возвращает класс-модель Users
+     *
+     * @param $id
+     * @return Users|IdentityInterface|null
+     */
+    public static function findIdentity($id): Users|IdentityInterface|null
+    {
+        return self::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+
+    /** Метод возвращает id текущего пользователя
+     *
+     * @return int|string
+     */
+    public function getId(): int|string
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+        // TODO: Implement getAuthKey() method.
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // TODO: Implement validateAuthKey() method.
     }
 }

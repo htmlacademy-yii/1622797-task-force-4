@@ -2,16 +2,15 @@
 
 namespace app\controllers;
 
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use app\models\Users;
 
-class UserController extends Controller
+class UserController extends SecuredController
 {
     /**
      * @throws NotFoundHttpException
      */
-    public function actionView($id)
+    public function actionView($id): string
     {
         $user = Users::findOne($id);
         if (!$user || !$user->is_executor) {

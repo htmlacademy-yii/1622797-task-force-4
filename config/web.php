@@ -8,6 +8,7 @@ $config = [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'language' => 'ru-RU',
+    'defaultRoute' => 'landing',
     'timeZone' => 'Europe/Moscow',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
@@ -22,11 +23,11 @@ $config = [
             'class' => 'yii\caching\FileCache',
         ],
         'user' => [
-            'identityClass' => 'app\models\User',
+            'identityClass' => 'app\models\Users',
             'enableAutoLogin' => true,
         ],
         'errorHandler' => [
-            'errorAction' => 'site/error',
+            'errorAction' => 'landing/error',
         ],
         'mailer' => [
             'class' => \yii\symfonymailer\Mailer::class,
@@ -50,7 +51,8 @@ $config = [
             'rules' => [
                 'tasks/page=<page:\d+>' => 'tasks/index',
                 'tasks/view/<id:\d+>' => 'tasks/view',
-                'user/view/<id:\d+>' => 'user/view'
+                'user/view/<id:\d+>' => 'user/view',
+                'registration' => 'registration/index'
             ],
         ],
     ],

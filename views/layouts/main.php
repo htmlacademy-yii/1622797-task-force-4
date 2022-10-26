@@ -5,14 +5,9 @@
 
 use app\assets\MainAsset;
 use yii\bootstrap5\Html;
+use yii\helpers\Url;
 
 MainAsset::register($this);
-
-$this->registerCsrfMetaTags();
-$this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
-$this->registerMetaTag(['name' => 'viewport', 'content' => 'width=device-width, initial-scale=1, shrink-to-fit=no']);
-$this->registerMetaTag(['name' => 'description', 'content' => $this->params['meta_description'] ?? '']);
-$this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']);
 ?>
 
 <?php $this->beginPage(); ?>
@@ -28,7 +23,7 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
 
 <header class="page-header">
     <nav class="main-nav">
-        <a href='#' class="header-logo">
+        <a href="<?= Url::toRoute('/tasks'); ?>" class="header-logo">
             <img class="logo-image" src="/img/logotype.png" width=227 height=60 alt="taskforce">
         </a>
         <?php if (!Yii::$app->user->isGuest) : ?>
@@ -53,10 +48,11 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
     <?php if (!Yii::$app->user->isGuest) : ?>
     <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="/img/man-glasses.png" width="55" height="55" alt="Аватар">
+            <img class="user-photo" src="<?= (Yii::$app->user->getIdentity()
+                ->avatarFile->url); ?>" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
-            <p class="user-name">Василий</p>
+            <p class="user-name"><?= (Yii::$app->user->getIdentity()->name); ?></p>
             <div class="popup-head">
                 <ul class="popup-menu">
                     <li class="menu-item">
@@ -66,7 +62,8 @@ $this->registerMetaTag(['name' => 'keywords', 'content' => $this->params['meta_k
                         <a href="#" class="link">Связаться с нами</a>
                     </li>
                     <li class="menu-item">
-                        <a href="#" class="link">Выход из системы</a>
+                        <a href="<?= Url::toRoute('/landing/logout') ;?>"
+                           class="link">Выход из системы</a>
                     </li>
 
                 </ul>
