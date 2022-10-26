@@ -3,13 +3,12 @@
 namespace app\controllers;
 
 use Yii;
-use yii\web\Controller;
 use yii\data\ActiveDataProvider;
 use yii\web\NotFoundHttpException;
 use app\models\forms\TaskFilterForm;
 use app\models\Tasks;
 
-class TasksController extends Controller
+class TasksController extends SecuredController
 {
     /**
      * @return string

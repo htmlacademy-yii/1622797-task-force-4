@@ -9,10 +9,10 @@ use app\models\Tasks;
 
 class TaskFilterForm extends Model
 {
-    public $category;
-    public $remoteTask;
-    public $withoutExecutor;
-    public $period;
+    public array $category = [];
+    public string $remoteTask = '';
+    public string $withoutExecutor = '';
+    public string $period = '';
 
     /**
      * @return string[]
