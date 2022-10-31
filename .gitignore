@@ -9,4 +9,5 @@ Thumbs.db
 vendor
 *.cache
 runtime
-db.php
+config/db.php
+web/uploads/*

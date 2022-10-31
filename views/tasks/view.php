@@ -2,6 +2,7 @@
 
 /** @var yii\web\View $this
  * @var object $task
+ * @var object $taskCreateForm
  */
 
 use app\widgets\StarsWidget;
@@ -76,7 +77,7 @@ use yii\helpers\Url;
             <dt>Срок выполнения</dt>
             <dd><?=Yii::$app->formatter->asDate(
                 $task->period_execution,
-                'php:d F Y, H:i'
+                'php:d F Y'
             ); ?></dd>
             <dt>Статус</dt>
             <dd><?= $task->getStatusName(); ?></dd>
@@ -85,14 +86,18 @@ use yii\helpers\Url;
     <div class="right-card white file-card">
         <h4 class="head-card">Файлы задания</h4>
         <ul class="enumeration-list">
+            <?php foreach ($task->tasksFiles as $taskFile) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-                <p class="file-size">356 Кб</p>
+                <a href="<?= $taskFile->file->url; ?>"
+                class="link link--block link--clip"><?= $taskFile->file->url; ?>
+                </a>
+                <p class="file-size"><?= Yii::$app->formatter->asShortSize(
+                    filesize(Yii::getAlias(
+                        '@webroot/uploads/'
+                    ) . $taskFile->file->url)
+                                     ); ?></p>
             </li>
-            <li class="enumeration-item">
-                <a href="#" class="link link--block link--clip">information.docx</a>
-                <p class="file-size">12 Кб</p>
-            </li>
+            <?php endforeach; ?>
         </ul>
     </div>
 </div>
