@@ -6,7 +6,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "executor_category".
+ * This is the model class for table "executorCategory".
  *
  * @property int $category_id
  * @property int $user_id

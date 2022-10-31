@@ -6,7 +6,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "tasks_files".
+ * This is the model class for table "tasksFiles".
  *
  * @property int $id
  * @property int $task_id
@@ -48,7 +48,7 @@ class TasksFiles extends ActiveRecord
         return [
             'id' => 'ID',
             'task_id' => 'Task ID',
-            'file_id' => 'File ID',
+            'file_id' => 'File ID'
         ];
     }
 

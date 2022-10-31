@@ -5,6 +5,7 @@ namespace taskforce\helpers;
 class MainHelpers
 {
     /** Метод для показа человекочитаемого формата даты или времени
+     *
      * @param int $number
      * @param string $one
      * @param string $two

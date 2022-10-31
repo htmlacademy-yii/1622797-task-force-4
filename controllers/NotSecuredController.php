@@ -7,7 +7,7 @@ use yii\filters\AccessControl;
 
 class NotSecuredController extends Controller
 {
-    /** Метод отвечате за права доступа залогиненного пользователя к разделам сайта
+    /** Метод отвечает за права доступа залогиненного пользователя к разделам сайта
      *
      * @return array[]
      */

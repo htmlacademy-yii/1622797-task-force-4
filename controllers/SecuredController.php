@@ -2,12 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\Users;
+use Yii;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 
 class SecuredController extends Controller
 {
-    /** Метод отвечате за права доступа незалогиненного пользователя к разделам сайта
+    /** Метод отвечает за права доступа незалогиненного пользователя к разделам сайта
      *
      * @return array[]
      */
