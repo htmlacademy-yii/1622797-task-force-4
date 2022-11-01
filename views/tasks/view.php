@@ -7,6 +7,7 @@
 
 use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
+use yii\helpers\Html;
 use yii\helpers\Url;
 
 ?>
@@ -50,9 +51,8 @@ use yii\helpers\Url;
             </div>
             <div class="feedback-wrapper">
                 <p class="info-text"><span class="current-time">
-                        <?= Yii::$app->formatter->format(
-                            $response->date_creation,
-                            'relativeTime'
+                        <?= Yii::$app->formatter->asRelativeTime(
+                            $response->date_creation
                         ); ?></span></p>
                 <p class="price price--small"><?= $response->price; ?> ₽</p>
             </div>
@@ -70,15 +70,9 @@ use yii\helpers\Url;
             <dt>Категория</dt>
             <dd><?= $task->category->name; ?></dd>
             <dt>Дата публикации</dt>
-            <dd><?= Yii::$app->formatter->format(
-                $task->date_creation,
-                'relativeTime'
-            ); ?></dd>
+            <dd><?= Yii::$app->formatter->asRelativeTime($task->date_creation); ?></dd>
             <dt>Срок выполнения</dt>
-            <dd><?=Yii::$app->formatter->asDate(
-                $task->period_execution,
-                'php:d F Y'
-            ); ?></dd>
+            <dd><?=Yii::$app->formatter->asDate($task->period_execution); ?></dd>
             <dt>Статус</dt>
             <dd><?= $task->getStatusName(); ?></dd>
         </dl>
@@ -88,9 +82,11 @@ use yii\helpers\Url;
         <ul class="enumeration-list">
             <?php foreach ($task->tasksFiles as $taskFile) : ?>
             <li class="enumeration-item">
-                <a href="<?= $taskFile->file->url; ?>"
-                class="link link--block link--clip"><?= $taskFile->file->url; ?>
-                </a>
+                <?= Html::a(
+                    $taskFile->file->url,
+                    ['tasks/download', 'path' => $taskFile->file->url],
+                    ['class' => 'link link--block link--clip']
+                ); ?>
                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
                     filesize(Yii::getAlias(
                         '@webroot/uploads/'

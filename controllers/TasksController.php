@@ -89,4 +89,14 @@ class TasksController extends SecuredController
         }
         return $this->render('create', ['taskCreateForm' => $taskCreateForm]);
     }
+
+    /** Метод загружает файлы задания польователю
+     *
+     * @param $path
+     * @return void|null
+     */
+    public function actionDownload($path)
+    {
+        return Yii::$app->response->sendFile(Yii::getAlias('@webroot/uploads/') . $path)->send();
+    }
 }
