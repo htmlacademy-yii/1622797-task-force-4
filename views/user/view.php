@@ -7,25 +7,26 @@
 use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
 use yii\helpers\Url;
+use yii\helpers\HtmlPurifier;
 
 ?>
 
 <div class="left-column">
-    <h3 class="head-main"><?= $user->name; ?></h3>
+    <h3 class="head-main"><?= HtmlPurifier::process($user->name); ?></h3>
     <div class="user-card">
         <div class="photo-rate">
             <img class="card-photo" src="<?= (empty(
-                $user->avatarFile->url
-            )) ? '' : $user->avatarFile->url; ?>"
+                HtmlPurifier::process($user->avatarFile->url)
+            )) ? '' : HtmlPurifier::process($user->avatarFile->url); ?>"
                  width="191" height="190" alt="Фото пользователя">
             <div class="card-rate">
                 <div class="stars-rating big"><?= StarsWidget::widget(
                 ['grade' => $user->getExecutorGrade()]
             ); ?></div>
-                <span class="current-rate"><?= $user->getExecutorGrade(); ?></span>
+                <span class="current-rate"><?= HtmlPurifier::process($user->getExecutorGrade()); ?></span>
             </div>
         </div>
-        <p class="user-description"><?= $user->bio; ?></p>
+        <p class="user-description"><?= HtmlPurifier::process($user->bio); ?></p>
     </div>
     <div class="specialization-bio">
         <?php if (!empty($user->executorCategories)) : ?>
@@ -35,7 +36,7 @@ use yii\helpers\Url;
                 <?php foreach ($user->executorCategories as $executorCategory) : ?>
                 <li class="special-item">
                     <a href="#" class="link link--regular">
-                        <?= $executorCategory->category->name; ?>
+                        <?= HtmlPurifier::process($executorCategory->category->name); ?>
                     </a>
                 </li>
                 <?php endforeach; ?>
@@ -47,7 +48,7 @@ use yii\helpers\Url;
             <p class="bio-info"><span class="country-info">Россия</span>,
                 <span class="town-info"><?= !empty($user->city) ?
                                     $user->city->name . ',' : '' ; ?></span>
-                <span class="age-info"><?= $user->getUserAge(); ?></span>
+                <span class="age-info"><?= HtmlPurifier::process($user->getUserAge()); ?></span>
                 <?= MainHelpers::getNounPluralForm(
                                         $user->getUserAge(),
                                         'год',
@@ -62,14 +63,14 @@ use yii\helpers\Url;
         <?php foreach ($user->executorFeedbacks as $executorFeedback) : ?>
     <div class="response-card">
         <img class="customer-photo" src="
-            <?= $executorFeedback->task->customer->avatarFile->url; ?>"
+            <?= HtmlPurifier::process($executorFeedback->task->customer->avatarFile->url); ?>"
              width="120" height="127" alt="Фото заказчиков">
         <div class="feedback-wrapper">
-            <p class="feedback">«<?= $executorFeedback->description; ?>»</p>
+            <p class="feedback">«<?= HtmlPurifier::process($executorFeedback->description); ?>»</p>
             <p class="task">Задание «<a href="
             <?= Url::toRoute(['tasks/view','id' => $executorFeedback->task->id]); ?>"
                                         class="link link--small">
-                    <?= $executorFeedback->task->name; ?></a>» выполнено</p>
+                    <?= HtmlPurifier::process($executorFeedback->task->name); ?></a>» выполнено</p>
         </div>
         <div class="feedback-wrapper">
             <div class="stars-rating small"><?= StarsWidget::widget([
@@ -89,28 +90,32 @@ use yii\helpers\Url;
         <h4 class="head-card">Статистика исполнителя</h4>
         <dl class="black-list">
             <dt>Всего заказов</dt>
-            <dd><?= $user->getExecutedTasks()->count()  . ' выполнено, ' .
-                        $user->getFailedTasks()->count() . ' провалено ' ; ?></dd>
+            <dd><?= HtmlPurifier::process($user->getExecutedTasks()->count())  . ' выполнено, ' .
+                HtmlPurifier::process($user->getFailedTasks()->count()) . ' провалено ' ; ?></dd>
             <dt>Место в рейтинге</dt>
-            <dd><?= $user->getExecutorRating(); ?> место</dd>
+            <dd><?= HtmlPurifier::process($user->getExecutorRating()); ?> место</dd>
             <dt>Дата регистрации</dt>
-            <dd><?= Yii::$app->formatter->asDate($user->date_creation); ?></dd>
+            <dd><?= Yii::$app->formatter->asDate(HtmlPurifier::process($user->date_creation)); ?></dd>
             <dt>Статус</dt>
-            <dd><?= $user->getExecutorStatus(); ?></dd>
+            <dd><?= HtmlPurifier::process($user->getExecutorStatus()); ?></dd>
         </dl>
     </div>
     <div class="right-card white">
         <h4 class="head-card">Контакты</h4>
         <ul class="enumeration-list">
+            <?php if ($user->phone !== null) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--phone"><?= $user->phone ?: 'Не указан' ?></a>
+                <a href="#" class="link link--block link--phone"><?= HtmlPurifier::process($user->phone); ?></a>
             </li>
+            <?php endif; ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--email"><?= $user->email; ?></a>
+                <a href="#" class="link link--block link--email"><?= HtmlPurifier::process($user->email); ?></a>
             </li>
+            <?php if ($user->telegram !== null) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--tg"><?= $user->telegram ?: 'Не указан' ?></a>
+                <a href="#" class="link link--block link--tg"><?= HtmlPurifier::process($user->telegram); ?></a>
             </li>
+            <?php endif; ?>
         </ul>
     </div>
 </div>

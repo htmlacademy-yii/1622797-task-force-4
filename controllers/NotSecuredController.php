@@ -2,8 +2,8 @@
 
 namespace app\controllers;
 
-use yii\web\Controller;
 use yii\filters\AccessControl;
+use yii\web\Controller;
 
 class NotSecuredController extends Controller
 {

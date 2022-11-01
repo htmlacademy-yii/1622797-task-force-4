@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Throwable;
 use Yii;
 use yii\web\Response;
 use app\models\forms\LoginForm;
@@ -25,6 +26,7 @@ class LandingController extends NotSecuredController
 
     /**
      * @return Response|array|string
+     * @throws Throwable
      */
     public function actionIndex(): Response|array|string
     {

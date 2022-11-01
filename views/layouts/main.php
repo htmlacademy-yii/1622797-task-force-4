@@ -6,6 +6,7 @@
 use app\assets\MainAsset;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
+use yii\helpers\HtmlPurifier;
 
 MainAsset::register($this);
 $user = Yii::$app->user->getIdentity();
@@ -54,7 +55,7 @@ $user = Yii::$app->user->getIdentity();
             <img class="user-photo" src="#" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
-            <p class="user-name"><?= (Yii::$app->user->getIdentity()->name); ?></p>
+            <p class="user-name"><?= HtmlPurifier::process(Yii::$app->user->getIdentity()->name); ?></p>
             <div class="popup-head">
                 <ul class="popup-menu">
                     <li class="menu-item">
