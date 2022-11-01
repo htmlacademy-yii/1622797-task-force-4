@@ -54,7 +54,9 @@ use yii\helpers\Url;
                         <?= Yii::$app->formatter->asRelativeTime(
                             $response->date_creation
                         ); ?></span></p>
-                <p class="price price--small"><?= $response->price; ?> ₽</p>
+                <?php if ($response->price !== null) : ?>
+                <p class="price price--small"><?= $response->price . ' ₽'; ?></p>
+                <?php endif; ?>
             </div>
             <div class="button-popup">
                 <a href="#" class="button button--blue button--small">Принять</a>

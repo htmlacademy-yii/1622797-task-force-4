@@ -13,7 +13,9 @@ use yii\helpers\Url;
     <div class="header-task">
         <a  href="<?= Url::toRoute(['tasks/view/', 'id' => $model->id]); ?>"
             class="link link--block link--big"><?=HtmlPurifier::process($model->name); ?></a>
+        <?php if ($model->budget !== null) : ?>
         <p class="price price--task"><?= HtmlPurifier::process($model->budget) . ' ₽'; ?></p>
+        <?php endif; ?>
     </div>
     <p class="info-text"><span class="current-time"><?= Yii::$app->formatter
                 ->format(
