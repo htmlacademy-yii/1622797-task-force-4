@@ -15,10 +15,6 @@ class RegistrationUser
      */
     public static function registration(RegistrationForm $form): ?bool
     {
-        if (!$form->validate()) {
-            return null;
-        }
-
         $user = new Users();
         $user->name = $form->name;
         $user->email = $form->email;
@@ -26,6 +22,6 @@ class RegistrationUser
         $user->password = Yii::$app->security->generatePasswordHash($form->password);
         $user->is_executor = $form->isExecutor;
 
-        return $user->save();
+        return $user->save(false);
     }
 }
