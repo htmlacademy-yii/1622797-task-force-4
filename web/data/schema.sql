@@ -94,14 +94,14 @@ CREATE TABLE feedback (
 );
 
 /* Таблица с откликами исполнителей */
-CREATE TABLE response (
+CREATE TABLE offers (
   id int AUTO_INCREMENT PRIMARY KEY,
   date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
   task_id int NOT NULL,
   executor_id int NOT NULL,
   price int,
   comment TEXT,
-  refuse TINYTEXT,
+  refuse BOOLEAN NOT NULL,
   FOREIGN KEY (executor_id) REFERENCES users (id),
   FOREIGN KEY (task_id) REFERENCES tasks (id)
 );

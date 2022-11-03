@@ -6,5 +6,5 @@ use yii\test\ActiveFixture;
 
 class ResponseFixture extends ActiveFixture
 {
-    public $modelClass = 'app\models\Response';
+    public $modelClass = 'app\models\Offers';
 }

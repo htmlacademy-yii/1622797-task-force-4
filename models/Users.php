@@ -33,7 +33,7 @@ use yii\web\IdentityInterface;
  * @property ExecutorCategory[] $executorCategories
  * @property Feedback[] $feedbacks
  * @property Feedback[] $feedbacks0
- * @property Response[] $responses
+ * @property Offers[] $responses
  * @property Tasks[] $tasks
  * @property Tasks[] $tasks0
  */
@@ -151,9 +151,9 @@ class Users extends ActiveRecord implements IdentityInterface
      *
      * @return ActiveQuery
      */
-    public function getResponses(): ActiveQuery
+    public function getOffers(): ActiveQuery
     {
-        return $this->hasMany(Response::class, ['executor_id' => 'id']);
+        return $this->hasMany(Offers::class, ['executor_id' => 'id']);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use taskforce\exception\TaskActionException;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -25,7 +26,7 @@ use yii\db\ActiveRecord;
  * @property Users $customer
  * @property Users $executor
  * @property Feedback[] $feedbacks
- * @property Response[] $responses
+ * @property Offers[] $responses
  * @property TasksFiles[] $tasksFiles
  */
 class Tasks extends ActiveRecord
@@ -141,9 +142,9 @@ class Tasks extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getResponses(): ActiveQuery
+    public function getOffers(): ActiveQuery
     {
-        return $this->hasMany(Response::class, ['task_id' => 'id']);
+        return $this->hasMany(Offers::class, ['task_id' => 'id']);
     }
 
     /**
@@ -178,5 +179,18 @@ class Tasks extends ActiveRecord
     {
         $statusList = $this->getTaskStatusesList();
         return $statusList[$this->status];
+    }
+
+    /** Метод проверяет назначен ли исполнитель для задания и если нет, то назначает
+     *
+     * @param $executorId
+     * @return bool
+     */
+    public function setExecutor($executorId): bool
+    {
+        $this->executor_id = $executorId;
+        $this->status = Tasks::STATUS_AT_WORK;
+
+        return $this->save();
     }
 }

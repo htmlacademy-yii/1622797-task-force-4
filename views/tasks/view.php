@@ -3,8 +3,10 @@
 /** @var yii\web\View $this
  * @var object $task
  * @var object $taskCreateForm
+ * @var object $user
  */
 
+use app\models\Tasks;
 use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
 use yii\helpers\Html;
@@ -27,8 +29,10 @@ use yii\helpers\HtmlPurifier;
         <p class="map-address town">Москва</p>
         <p class="map-address">Новый арбат, 23, к. 1</p>
     </div>
+    <?php if ($user->id === $task->customer_id || $user->is_executor === 1) : ?>
     <h4 class="head-regular">Отклики на задание</h4>
-    <?php foreach ($task->responses as $response) : ?>
+        <?php foreach ($task->offers as $response) : ?>
+            <?php if ($user->id === $task->customer_id || $user->id === $response->executor_id) : ?>
         <div class="response-card">
             <img class="customer-photo" src="<?=
             (empty($response->executor->avatarFile->url)) ? '' : $response->executor->avatarFile->url; ?>"
@@ -42,11 +46,11 @@ use yii\helpers\HtmlPurifier;
                     </div>
                     <p class="reviews"><?= HtmlPurifier::process($response->executor->getFeedbacksCount()); ?>
                         <?= MainHelpers::getNounPluralForm(
-                            $response->executor->getFeedbacksCount(),
-                            'отзыв',
-                            'отзыва',
-                            'отзывов'
-                        ); ?></p>
+                $response->executor->getFeedbacksCount(),
+                'отзыв',
+                'отзыва',
+                'отзывов'
+            ); ?></p>
                 </div>
                 <p class="response-message"><?= HtmlPurifier::process($response->comment); ?></p>
             </div>
@@ -59,12 +63,24 @@ use yii\helpers\HtmlPurifier;
                 <p class="price price--small"><?= HtmlPurifier::process($response->price . ' ₽'); ?></p>
                 <?php endif; ?>
             </div>
+                <?php if (
+                    $user->id === $task->customer_id &&
+                        $response->refuse === 0 &&
+                    $response->task->status === Tasks::STATUS_NEW
+                ) : ?>
             <div class="button-popup">
-                <a href="#" class="button button--blue button--small">Принять</a>
-                <a href="#" class="button button--orange button--small">Отказать</a>
+                <a href="<?= Url::toRoute(['/tasks/start',
+                    'task' => $response->task->id, 'user' => $response->executor_id]) ?>"
+                   class="button button--blue button--small">Принять</a>
+                <a href="<?= Url::toRoute(['/tasks/cancel',
+                    'task' => $response->task->id, 'user' => $response->executor_id]) ?>"
+                   class="button button--orange button--small">Отказать</a>
             </div>
+                <?php endif; ?>
         </div>
-    <?php endforeach; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 <div class="right-column">
     <div class="right-card black info-card">
@@ -94,7 +110,7 @@ use yii\helpers\HtmlPurifier;
                     filesize(Yii::getAlias(
                         '@webroot/uploads/'
                     ) . HtmlPurifier::process($taskFile->file->url))
-                                     ); ?></p>
+                ); ?></p>
             </li>
             <?php endforeach; ?>
         </ul>

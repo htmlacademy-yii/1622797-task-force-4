@@ -13,7 +13,7 @@ class UserController extends SecuredController
     public function actionView($id): string
     {
         $user = Users::findOne($id);
-        if (!$user || $user->is_executor !== 0) {
+        if (!$user || !$user->is_executor) {
             throw new NotFoundHttpException("У вас нет доступа к странице пользователя с ID $id");
         }
         return $this->render('view', ['user' => $user]);
