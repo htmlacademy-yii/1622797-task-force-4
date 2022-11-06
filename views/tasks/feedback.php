@@ -8,8 +8,6 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
-$this->registerJsFile('/js/starsGrade.js');
-
 ?>
 
 <section class="pop-up pop-up--completion pop-up--close">
@@ -22,21 +20,22 @@ $this->registerJsFile('/js/starsGrade.js');
         <div class="completion-form pop-up--form regular-form">
             <?php $form = ActiveForm::begin([
                 'id' => 'feedback-form',
+                'method' => 'post',
                 'action' => Url::toRoute('tasks/feedback')]); ?>
-                <div class="form-group">
-                    <?= $form->field($feedbackForm, 'content', [
+
+                <?= $form->field($feedbackForm, 'content', [
                         'labelOptions' => ['for' => 'completion-comment',
                             'class' => 'control-label'],
                         'inputOptions' => ['id' => 'completion-comment']])->textarea(); ?>
-                </div>
+
                 <?= $form->field($feedbackForm, 'grade', [
                     'template' => '{input}'])->hiddenInput()->label(false); ?>
                 <p class="completion-head control-label">Оценка работы</p>
                 <div class="stars-rating big active-stars"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div>
 
-            <?= $form->field($feedbackForm, 'taskId', [
+                <?= $form->field($feedbackForm, 'taskId', [
                 'template' => '{input}'])
-                ->hiddenInput(['value' => $task->id])->label(false); ?>)
+                ->hiddenInput(['value' => $task->id])->label(false) ?>
 
                 <?= Html::submitInput(
                     'Завершить',

@@ -2,8 +2,14 @@
 
 namespace app\controllers;
 
+use app\models\forms\FeedbackForm;
+use app\models\forms\OffersForm;
 use app\models\Offers;
-use taskforce\exception\TaskActionException;
+use taskforce\actions\CancelAction;
+use taskforce\actions\OffersAction;
+use taskforce\actions\RefuseAction;
+use taskforce\actions\RemoveAction;
+use taskforce\actions\StartAction;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -61,6 +67,8 @@ class TasksController extends SecuredController
     {
         $user = Yii::$app->user->identity;
         $taskCreateForm = new TaskCreateForm();
+        $newOffers = new OffersForm();
+        $feedbackForm = new FeedbackForm();
         $task = Tasks::findOne($id);
         if (!$task) {
             throw new NotFoundHttpException("Задания с ID $id не сущесвует");
@@ -68,6 +76,8 @@ class TasksController extends SecuredController
         return $this->render('view', [
             'task' => $task,
             'taskCreateForm' => $taskCreateForm,
+            'newOffers' => $newOffers,
+            'feedbackForm' => $feedbackForm,
             'user' => $user
         ]);
     }
@@ -113,37 +123,106 @@ class TasksController extends SecuredController
 
     /** Метод назначает исполнителя для задания
      *
-     * @param $task
-     * @param $user
-     * @return void|Response
+     * @param $taskId
+     * @param $userId
+     * @return Response
      */
-    public function actionStart($task, $user)
+    public function actionStart($taskId, $userId): Response
     {
-        $task = Tasks::findOne($task);
+        $task = Tasks::findOne($taskId);
+        $task->status = Tasks::STATUS_AT_WORK;
+        $task->executor_id = $userId;
+        $task->update();
 
-        if ($task->customer_id === Yii::$app->user->getId()) {
-            $task->setExecutor($user);
-
-            return $this->redirect(Yii::$app->request->referrer);
-        }
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отказа исполнителю в участии в Задании
      *
-     * @param $task
-     * @param $user
-     * @return void|Response
+     * @param $responseId
+     * @return Response
      */
-    public function actionCancel($task, $user)
+    public function actionRefuse($responseId): Response
     {
-        $customer = Tasks::findOne($task)->customer_id;
+        $offers = Offers::findOne($responseId);
+        $offers->refuse = 1;
+        $offers->save();
 
-        if ($customer === Yii::$app->user->getId()) {
-            $offers = Offers::find()->andWhere(['task_id' => $task, 'executor_id' => $user])->one();
-            $offers->refuse = 1;
-            $offers->save();
+        return $this->redirect(Yii::$app->request->referrer);
+    }
+
+    /** Метод создает отзыв исполнителя под Заданием
+     *
+     * @return string|Response
+     */
+    public function actionOffers(): string|Response
+    {
+        $newOffers = new OffersForm();
+
+        if (Yii::$app->request->getIsPost()) {
+            $newOffers->load(Yii::$app->request->post());
+
+            if ($newOffers->validate()) {
+                $newOffers->createOffers();
+
+                return $this->redirect(Yii::$app->request->referrer);
+            }
+        }
+        return $this->redirect('/tasks');
+    }
+
+    /**
+     * @return Response
+     */
+    public function actionFeedback(): Response
+    {
+        $feedback = new FeedbackForm();
+
+        if (Yii::$app->request->getIsPost()) {
+            $feedback->load(Yii::$app->request->post());
+
+            if ($feedback->validate()) {
+                $feedback->createFeedback();
+
+                return $this->redirect(Yii::$app->request->referrer);
+            }
+        }
+        return $this->redirect('/tasks');
+    }
+
+    /** Метод для отмены задания его владельцом
+     *
+     * @param $id
+     * @return Response
+     */
+    public function actionRemove($id): Response
+    {
+        $task = Tasks::findOne($id);
+        $action = new RemoveAction();
+
+        if ($action->rightsCheck($task, Yii::$app->user->identity->id)) {
+            $action->removeTask($id);
 
             return $this->redirect(Yii::$app->request->referrer);
         }
+        return $this->redirect('/tasks');
+    }
+
+    /** Метод для отказа от задания исполнителем
+     *
+     * @param $id
+     * @return Response
+     */
+    public function actionCancel($id)
+    {
+        $task = Tasks::findOne($id);
+        $action = new CancelAction();
+
+        if ($action->rightsCheck($task, Yii::$app->user->identity->id)) {
+            $action->cancelTask($id);
+
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+        return $this->redirect('/tasks');
     }
 }

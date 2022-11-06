@@ -1,7 +1,7 @@
 <?php
 
 /** @var yii\web\View $this
- * @var object $offersForm
+ * @var object $newOffers
  */
 
 use yii\widgets\ActiveForm;
@@ -20,23 +20,23 @@ use yii\helpers\Url;
         <div class="addition-form pop-up--form regular-form">
             <?php $form = ActiveForm::begin([
                 'id' => 'offers-form',
+                'method' => 'post',
                 'action' => Url::toRoute('tasks/offers')]); ?>
-                <div class="form-group">
-                    <?= $form->field($offersForm, 'content', [
+
+                <?= $form->field($newOffers, 'content', [
                     'labelOptions' => ['for' => 'addition-comment',
                         'class' => 'control-label'],
                     'inputOptions' => ['id' => 'addition-comment']])->textarea(); ?>
-                </div>
-                <div class="form-group">
-                    <?= $form->field($offersForm, 'price', [
+
+                <?= $form->field($newOffers, 'price', [
                         'labelOptions' => ['for' => 'addition-price',
                             'class' => 'control-label'],
                         'inputOptions' => ['id' => 'addition-price']])
                         ->input('number'); ?>
-                </div>
-                    <?= $form->field($offersForm, 'taskId', [
-                        'template' => '{input}'])
-                        ->hiddenInput(['value' => $task->id])->label(false); ?>)
+
+                <?= $form->field($newOffers, 'taskId', [
+                    'template' => '{input}'])
+                    ->hiddenInput(['value' => $task->id])->label(false) ?>
 
                 <?= Html::submitInput(
                     'Завершить',

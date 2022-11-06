@@ -47,27 +47,27 @@ if (buttonInput) {
     });
 }
 
-var starRating = document.querySelector(".active-stars");
+let starRating = document.querySelector(".active-stars");
 
 if (starRating) {
-    starRating.addEventListener("click", function(event) {
-        var stars = event.currentTarget.childNodes;
-        var rating = 0;
+  starRating.addEventListener("click", function (event) {
+    let stars = event.currentTarget.childNodes;
+    let rating = 0;
 
-        for (var i = 0; i < stars.length; i++) {
-            var element = stars[i];
+    for (let i = 0; i < stars.length; i++) {
+      let element = stars[i];
 
-            if (element.nodeName === "SPAN") {
-                element.className = "fill-star";
-                rating++;
-            }
+      if (element.nodeName === "SPAN") {
+        element.className = "fill-star";
+        rating++;
+      }
 
-            if (element === event.target) {
-                break;
-            }
-        }
+      if (element === event.target) {
+        break;
+      }
+    }
 
-        var inputField = starRating.previousSibling;
-        inputField.value = rating;
-    });
+    let inputField = document.getElementById('feedbackform-grade');
+    inputField.value = rating;
+  });
 }

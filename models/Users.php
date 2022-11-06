@@ -92,7 +92,7 @@ class Users extends ActiveRecord implements IdentityInterface
             'telegram' => 'Telegram',
             'bio' => 'Bio',
             'status' => 'Status',
-            'is_executor' => 'Is Executor',
+            'is_executor' => 'Is Executor'
         ];
     }
 

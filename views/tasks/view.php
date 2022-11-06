@@ -4,6 +4,8 @@
  * @var object $task
  * @var object $taskCreateForm
  * @var object $user
+ * @var object $newOffers
+ * @var object $feedbackForm
  */
 
 use app\models\Tasks;
@@ -12,6 +14,7 @@ use taskforce\helpers\MainHelpers;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\helpers\HtmlPurifier;
+use app\widgets\ActionsWidget;
 
 ?>
 
@@ -21,9 +24,11 @@ use yii\helpers\HtmlPurifier;
         <p class="price price--big"><?= HtmlPurifier::process($task->budget); ?> ₽</p>
     </div>
     <p class="task-description"><?= HtmlPurifier::process($task->description); ?></p>
-    <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
-    <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
-    <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+    <?php if (!$task->checkUserOffers(Yii::$app->user->identity->id)) : ?>
+        <?php foreach ($task->getAvailableActions(Yii::$app->user->identity->id) as $actionObject) : ?>
+            <?= $actionObject !== null ? ActionsWidget::widget(['actionObject' => $actionObject]) : '' ; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
     <div class="task-map">
         <img class="map" src="../../img/map.png" width="725" height="346" alt="Новый арбат, 23, к. 1">
         <p class="map-address town">Москва</p>
@@ -70,10 +75,10 @@ use yii\helpers\HtmlPurifier;
                 ) : ?>
             <div class="button-popup">
                 <a href="<?= Url::toRoute(['/tasks/start',
-                    'task' => $response->task->id, 'user' => $response->executor_id]) ?>"
+                    'taskId' => $response->task_id, 'userId' => $response->executor_id]) ?>"
                    class="button button--blue button--small">Принять</a>
-                <a href="<?= Url::toRoute(['/tasks/cancel',
-                    'task' => $response->task->id, 'user' => $response->executor_id]) ?>"
+                <a href="<?= Url::toRoute(['/tasks/refuse',
+                    'responseId' => $response->id]) ?>"
                    class="button button--orange button--small">Отказать</a>
             </div>
                 <?php endif; ?>
@@ -115,4 +120,8 @@ use yii\helpers\HtmlPurifier;
             <?php endforeach; ?>
         </ul>
     </div>
+    <?php echo $this->render('offers', ['task' => $task, 'newOffers' => $newOffers]); ?>
+    <?php echo $this->render('feedback', ['task' => $task, 'feedbackForm' => $feedbackForm]); ?>
+    <?php echo $this->render('cancel', ['task' => $task]); ?>
+    <?php echo $this->render('remove', ['task' => $task]); ?>
 </div>
