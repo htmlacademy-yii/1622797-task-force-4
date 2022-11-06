@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Exception;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -27,6 +28,7 @@ use yii\web\IdentityInterface;
  * @property string|null $bio
  * @property string $status
  * @property int $is_executor
+ * @property int $show_contacts
  *
  * @property Files $avatarFile
  * @property Cities $city
@@ -58,7 +60,7 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return [
             [['name', 'email', 'password', 'city_id', 'is_executor'], 'required'],
-            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor'], 'integer'],
+            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor', 'show_contacts'], 'integer'],
             [['date_creation', 'birthday'], 'safe'],
             [['bio', 'status'], 'string'],
             [['name', 'email'], 'string', 'max' => 255],
@@ -92,7 +94,8 @@ class Users extends ActiveRecord implements IdentityInterface
             'telegram' => 'Telegram',
             'bio' => 'Bio',
             'status' => 'Status',
-            'is_executor' => 'Is Executor'
+            'is_executor' => 'Is Executor',
+            'show_contacts' => 'Show Contacts'
         ];
     }
 
@@ -310,5 +313,15 @@ class Users extends ActiveRecord implements IdentityInterface
     public function validateAuthKey($authKey)
     {
         // TODO: Implement validateAuthKey() method.
+    }
+
+    /** Метод проверяет пароль пользователя на соответствие
+     *
+     * @param $password
+     * @return bool
+     */
+    public function validatePassword($password): bool
+    {
+        return Yii::$app->security->validatePassword($password, $this->password);
     }
 }

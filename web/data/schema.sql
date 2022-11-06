@@ -33,6 +33,7 @@ CREATE TABLE users (
   bio TEXT,
   status TINYTEXT,
   is_executor BOOLEAN NOT NULL,
+  show_contacts BOOLEAN NOT NULL,
   FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)
 );
