@@ -9,7 +9,6 @@ $config = [
     'bootstrap' => ['log'],
     'language' => 'ru-RU',
     'defaultRoute' => 'landing',
-    'timeZone' => 'Europe/Moscow',
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
@@ -55,6 +54,13 @@ $config = [
                 'registration' => 'registration/index'
             ],
         ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'dateFormat' => 'php:j F Y',
+            'datetimeFormat' => 'php:j F, H:i',
+            'timeFormat' => 'php:H:i:s',
+            'defaultTimeZone' => 'Europe/Moscow'
+        ]
     ],
     'params' => $params,
 ];

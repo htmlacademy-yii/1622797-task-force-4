@@ -33,6 +33,7 @@ CREATE TABLE users (
   bio TEXT,
   status TINYTEXT,
   is_executor BOOLEAN NOT NULL,
+  show_contacts BOOLEAN NOT NULL,
   FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)
 );
@@ -49,15 +50,15 @@ CREATE TABLE executorCategory (
 CREATE TABLE tasks (
   id int AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(255) NOT NULL,
-  description TEXT,
+  description TEXT NOT NULL,
   city_id int,
   date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   category_id int NOT NULL,
   customer_id int NOT NULL,
   executor_id int,
   status TINYTEXT DEFAULT new,
-  budget int NOT NULL,
-  period_execution DATETIME NOT NULL,
+  budget int,
+  period_execution DATE,
   FOREIGN KEY (customer_id) REFERENCES users (id),
   FOREIGN KEY (executor_id) REFERENCES users (id),
   FOREIGN KEY (category_id) REFERENCES categories (id),
@@ -94,14 +95,14 @@ CREATE TABLE feedback (
 );
 
 /* Таблица с откликами исполнителей */
-CREATE TABLE response (
+CREATE TABLE offers (
   id int AUTO_INCREMENT PRIMARY KEY,
   date_creation DATETIME DEFAULT CURRENT_TIMESTAMP,
   task_id int NOT NULL,
   executor_id int NOT NULL,
   price int,
   comment TEXT,
-  refuse TINYTEXT,
+  refuse BOOLEAN NOT NULL,
   FOREIGN KEY (executor_id) REFERENCES users (id),
   FOREIGN KEY (task_id) REFERENCES tasks (id)
 );

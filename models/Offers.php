@@ -6,7 +6,7 @@ use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
- * This is the model class for table "response".
+ * This is the model class for table "offers".
  *
  * @property int $id
  * @property string|null $date_creation
@@ -19,14 +19,14 @@ use yii\db\ActiveRecord;
  * @property Users $executor
  * @property Tasks $task
  */
-class Response extends ActiveRecord
+class Offers extends ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName(): string
     {
-        return 'response';
+        return 'offers';
     }
 
     /**

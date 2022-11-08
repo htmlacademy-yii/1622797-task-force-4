@@ -6,8 +6,10 @@
 use app\assets\MainAsset;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
+use yii\helpers\HtmlPurifier;
 
 MainAsset::register($this);
+$user = Yii::$app->user->getIdentity();
 ?>
 
 <?php $this->beginPage(); ?>
@@ -35,9 +37,11 @@ MainAsset::register($this);
                 <li class="list-item">
                     <a href="#" class="link link--nav" >Мои задания</a>
                 </li>
+                <?php if ($user->is_executor !== 1) : ?>
                 <li class="list-item">
-                    <a href="#" class="link link--nav" >Создать задание</a>
+                    <a href="<?= Url::toRoute('/tasks/create'); ?>" class="link link--nav" >Создать задание</a>
                 </li>
+                <?php endif; ?>
                 <li class="list-item">
                     <a href="#" class="link link--nav" >Настройки</a>
                 </li>
@@ -48,11 +52,10 @@ MainAsset::register($this);
     <?php if (!Yii::$app->user->isGuest) : ?>
     <div class="user-block">
         <a href="#">
-            <img class="user-photo" src="<?= (Yii::$app->user->getIdentity()
-                ->avatarFile->url); ?>" width="55" height="55" alt="Аватар">
+            <img class="user-photo" src="#" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
-            <p class="user-name"><?= (Yii::$app->user->getIdentity()->name); ?></p>
+            <p class="user-name"><?= HtmlPurifier::process(Yii::$app->user->getIdentity()->name); ?></p>
             <div class="popup-head">
                 <ul class="popup-menu">
                     <li class="menu-item">

@@ -9,10 +9,11 @@ use app\models\forms\RegistrationForm;
 
 class RegistrationUser
 {
-    /**
+    /** Метод сохраняет данные введенные при регистрации в БД
+     *
      * @throws Exception
      */
-    public static function registration(RegistrationForm $form): bool
+    public static function registration(RegistrationForm $form): ?bool
     {
         $user = new Users();
         $user->name = $form->name;

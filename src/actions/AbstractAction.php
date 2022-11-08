@@ -2,12 +2,14 @@
 
 namespace taskforce\actions;
 
-use taskforce\models\Task;
+use app\models\Tasks;
 
 abstract class AbstractAction
 {
-    protected string $name;
+    public string $name;
     protected string $internalName;
+    public string $class;
+    public string $dataAction;
 
     public function getName(): string
     {
@@ -19,5 +21,7 @@ abstract class AbstractAction
         return $this->internalName;
     }
 
-    abstract protected function rightsCheck(Task $task, int $currentUserId): bool;
+    abstract public function rightsCheck(Tasks $task, int $userId): bool;
+
+    abstract public function getLink(): ?string;
 }

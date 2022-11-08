@@ -2,6 +2,12 @@
 
 namespace app\models;
 
+use taskforce\actions\CancelAction;
+use taskforce\actions\CompleteAction;
+use taskforce\actions\RefuseAction;
+use taskforce\actions\OffersAction;
+use taskforce\actions\RemoveAction;
+use taskforce\actions\StartAction;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -25,7 +31,7 @@ use yii\db\ActiveRecord;
  * @property Users $customer
  * @property Users $executor
  * @property Feedback[] $feedbacks
- * @property Response[] $responses
+ * @property Offers[] $responses
  * @property TasksFiles[] $tasksFiles
  */
 class Tasks extends ActiveRecord
@@ -141,9 +147,9 @@ class Tasks extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getResponses(): ActiveQuery
+    public function getOffers(): ActiveQuery
     {
-        return $this->hasMany(Response::class, ['task_id' => 'id']);
+        return $this->hasMany(Offers::class, ['task_id' => 'id']);
     }
 
     /**
@@ -156,7 +162,8 @@ class Tasks extends ActiveRecord
         return $this->hasMany(TasksFiles::class, ['task_id' => 'id']);
     }
 
-    /**
+    /** Метод содержит все названия статусов задания
+     *
      * @return string[]
      */
     private function getTaskStatusesList(): array
@@ -171,12 +178,54 @@ class Tasks extends ActiveRecord
             ];
     }
 
-    /**
+    /** Метод для получения текущего статутса задания
+     *
      * @return string
      */
     public function getStatusName(): string
     {
         $statusList = $this->getTaskStatusesList();
         return $statusList[$this->status];
+    }
+
+    /** Функция для получения доступных действия для указанного статуса задания
+     *
+     * @param int $userId
+     * @return array возвращает статус задания в зависимости от роли пользователя
+     */
+    public function getAvailableActions(int $userId): array
+    {
+        $user = Users::findOne($userId);
+        switch ($this->status) {
+            case self::STATUS_NEW:
+                if ($userId === $this->customer_id) {
+                    return [new RemoveAction()];
+                } elseif ($user->is_executor === 1) {
+                    return [new OffersAction()];
+                }
+                break;
+
+            case self::STATUS_AT_WORK:
+                if ($userId === $this->customer_id) {
+                    return [new CompleteAction()];
+                } elseif ($userId === $this->executor_id) {
+                    return [new CancelAction()];
+                }
+                break;
+        }
+        return [];
+    }
+
+    /** Метод проверяет оставлял ли исполнитель отклик к конкурентому заданию или нет
+     *
+     * @param $id
+     * @return bool
+     */
+    public function checkUserOffers($id): bool
+    {
+        if (Offers::find()->where(['task_id' => $this->id, 'executor_id' => $id])->one()) {
+            return true;
+        }
+        return false;
     }
 }

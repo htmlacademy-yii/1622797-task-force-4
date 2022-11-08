@@ -2,97 +2,126 @@
 
 /** @var yii\web\View $this
  * @var object $task
+ * @var object $taskCreateForm
+ * @var object $user
+ * @var object $newOffers
+ * @var object $feedbackForm
  */
 
+use app\models\Tasks;
 use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
+use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\HtmlPurifier;
+use app\widgets\ActionsWidget;
 
 ?>
 
 <div class="left-column">
     <div class="head-wrapper">
-        <h3 class="head-main"><?= $task->name; ?></h3>
-        <p class="price price--big"><?= $task->budget; ?> ₽</p>
+        <h3 class="head-main"><?= HtmlPurifier::process($task->name); ?></h3>
+        <p class="price price--big"><?= HtmlPurifier::process($task->budget); ?> ₽</p>
     </div>
-    <p class="task-description"><?= $task->description; ?></p>
-    <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
-    <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
-    <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+    <p class="task-description"><?= HtmlPurifier::process($task->description); ?></p>
+    <?php if (!$task->checkUserOffers(Yii::$app->user->identity->id)) : ?>
+        <?php foreach ($task->getAvailableActions(Yii::$app->user->identity->id) as $actionObject) : ?>
+            <?= $actionObject !== null ? ActionsWidget::widget(['actionObject' => $actionObject]) : '' ; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
     <div class="task-map">
         <img class="map" src="../../img/map.png" width="725" height="346" alt="Новый арбат, 23, к. 1">
         <p class="map-address town">Москва</p>
         <p class="map-address">Новый арбат, 23, к. 1</p>
     </div>
+    <?php if ($user->id === $task->customer_id || $user->is_executor === 1) : ?>
     <h4 class="head-regular">Отклики на задание</h4>
-    <?php foreach ($task->responses as $response) : ?>
+        <?php foreach ($task->offers as $response) : ?>
+            <?php if ($user->id === $task->customer_id || $user->id === $response->executor_id) : ?>
         <div class="response-card">
             <img class="customer-photo" src="<?=
             (empty($response->executor->avatarFile->url)) ? '' : $response->executor->avatarFile->url; ?>"
                  width="146" height="156" alt="Фото заказчиков">
             <div class="feedback-wrapper">
                 <a href="<?= Url::toRoute(['user/view','id' => $response->executor->id]); ?>"
-                   class="link link--block link--big"><?= $response->executor->name; ?></a>
+                   class="link link--block link--big"><?= HtmlPurifier::process($response->executor->name); ?></a>
                 <div class="response-wrapper">
                     <div class="stars-rating small">
                         <?= StarsWidget::widget(['grade' => $response->executor->getExecutorGrade()]); ?>
                     </div>
-                    <p class="reviews"><?= $response->executor->getFeedbacksCount(); ?>
+                    <p class="reviews"><?= HtmlPurifier::process($response->executor->getFeedbacksCount()); ?>
                         <?= MainHelpers::getNounPluralForm(
-                            $response->executor->getFeedbacksCount(),
-                            'отзыв',
-                            'отзыва',
-                            'отзывов'
-                        ); ?></p>
+                $response->executor->getFeedbacksCount(),
+                'отзыв',
+                'отзыва',
+                'отзывов'
+            ); ?></p>
                 </div>
-                <p class="response-message"><?= $response->comment; ?></p>
+                <p class="response-message"><?= HtmlPurifier::process($response->comment); ?></p>
             </div>
             <div class="feedback-wrapper">
                 <p class="info-text"><span class="current-time">
-                        <?= Yii::$app->formatter->format(
-                            $response->date_creation,
-                            'relativeTime'
+                        <?= Yii::$app->formatter->asRelativeTime(
+                            HtmlPurifier::process($response->date_creation)
                         ); ?></span></p>
-                <p class="price price--small"><?= $response->price; ?> ₽</p>
+                <?php if ($response->price !== null) : ?>
+                <p class="price price--small"><?= HtmlPurifier::process($response->price . ' ₽'); ?></p>
+                <?php endif; ?>
             </div>
+                <?php if (
+                    $user->id === $task->customer_id &&
+                        $response->refuse === 0 &&
+                    $response->task->status === Tasks::STATUS_NEW
+                ) : ?>
             <div class="button-popup">
-                <a href="#" class="button button--blue button--small">Принять</a>
-                <a href="#" class="button button--orange button--small">Отказать</a>
+                <a href="<?= Url::toRoute(['/tasks/start',
+                    'taskId' => $response->task_id, 'userId' => $response->executor_id]) ?>"
+                   class="button button--blue button--small">Принять</a>
+                <a href="<?= Url::toRoute(['/tasks/refuse',
+                    'responseId' => $response->id]) ?>"
+                   class="button button--orange button--small">Отказать</a>
             </div>
+                <?php endif; ?>
         </div>
-    <?php endforeach; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 <div class="right-column">
     <div class="right-card black info-card">
         <h4 class="head-card">Информация о задании</h4>
         <dl class="black-list">
             <dt>Категория</dt>
-            <dd><?= $task->category->name; ?></dd>
+            <dd><?= HtmlPurifier::process($task->category->name); ?></dd>
             <dt>Дата публикации</dt>
-            <dd><?= Yii::$app->formatter->format(
-                $task->date_creation,
-                'relativeTime'
-            ); ?></dd>
+            <dd><?= Yii::$app->formatter->asRelativeTime(HtmlPurifier::process($task->date_creation)); ?></dd>
             <dt>Срок выполнения</dt>
-            <dd><?=Yii::$app->formatter->asDate(
-                $task->period_execution,
-                'php:d F Y, H:i'
-            ); ?></dd>
+            <dd><?=Yii::$app->formatter->asDate(HtmlPurifier::process($task->period_execution)); ?></dd>
             <dt>Статус</dt>
-            <dd><?= $task->getStatusName(); ?></dd>
+            <dd><?= HtmlPurifier::process($task->getStatusName()); ?></dd>
         </dl>
     </div>
     <div class="right-card white file-card">
         <h4 class="head-card">Файлы задания</h4>
         <ul class="enumeration-list">
+            <?php foreach ($task->tasksFiles as $taskFile) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-                <p class="file-size">356 Кб</p>
+                <?= Html::a(
+                    $taskFile->file->url,
+                    ['tasks/download', 'path' => $taskFile->file->url],
+                    ['class' => 'link link--block link--clip']
+                ); ?>
+                <p class="file-size"><?= Yii::$app->formatter->asShortSize(
+                    filesize(Yii::getAlias(
+                        '@webroot/uploads/'
+                    ) . HtmlPurifier::process($taskFile->file->url))
+                ); ?></p>
             </li>
-            <li class="enumeration-item">
-                <a href="#" class="link link--block link--clip">information.docx</a>
-                <p class="file-size">12 Кб</p>
-            </li>
+            <?php endforeach; ?>
         </ul>
     </div>
+    <?php echo $this->render('offers', ['task' => $task, 'newOffers' => $newOffers]); ?>
+    <?php echo $this->render('feedback', ['task' => $task, 'feedbackForm' => $feedbackForm]); ?>
+    <?php echo $this->render('cancel', ['task' => $task]); ?>
+    <?php echo $this->render('remove', ['task' => $task]); ?>
 </div>

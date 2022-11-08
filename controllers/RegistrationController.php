@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Throwable;
 use Yii;
 use yii\base\Exception;
 use yii\web\Response;
@@ -13,10 +14,14 @@ class RegistrationController extends NotSecuredController
 {
     /**
      * @return Response|string
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function actionIndex(): Response|string
     {
+        if (Yii::$app->user->getIdentity()) {
+            return $this->redirect('/tasks');
+        }
+
         $registrationForm = new RegistrationForm();
 
         if (Yii::$app->request->getIsPost()) {
@@ -27,7 +32,7 @@ class RegistrationController extends NotSecuredController
                         'Не удалось сохранить данные, попробуйте попытку позже'
                     );
                 }
-                return $this->redirect('/tasks');
+                return $this->redirect('/');
             }
         }
         return $this->render('index', ['registrationForm' => $registrationForm]);
