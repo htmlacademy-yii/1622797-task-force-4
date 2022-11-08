@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%tasks}}`.
  */
-class m221005_160738_create_tasks_table extends Migration
+class m221005_160550_create_tasks_table extends Migration
 {
     /**
      * {@inheritdoc}

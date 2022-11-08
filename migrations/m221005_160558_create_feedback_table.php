@@ -5,7 +5,7 @@ use yii\db\Migration;
 /**
  * Handles the creation of table `{{%feedback}}`.
  */
-class m221005_160556_create_feedback_table extends Migration
+class m221005_160558_create_feedback_table extends Migration
 {
     /**
      * {@inheritdoc}
