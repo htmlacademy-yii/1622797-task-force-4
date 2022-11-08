@@ -4,10 +4,8 @@ namespace app\models;
 
 use taskforce\actions\CancelAction;
 use taskforce\actions\CompleteAction;
-use taskforce\actions\RefuseAction;
 use taskforce\actions\OffersAction;
 use taskforce\actions\RemoveAction;
-use taskforce\actions\StartAction;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -57,8 +55,8 @@ class Tasks extends ActiveRecord
     {
         return [
             [['name', 'category_id', 'customer_id', 'status', 'budget', 'period_execution'], 'required'],
-            [['description'], 'string'],
-            [['city_id', 'category_id', 'customer_id', 'executor_id', 'status', 'budget'], 'integer'],
+            [['description', 'status'], 'string'],
+            [['city_id', 'category_id', 'customer_id', 'executor_id', 'budget'], 'integer'],
             [['date_creation', 'period_execution'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
@@ -223,7 +221,12 @@ class Tasks extends ActiveRecord
      */
     public function checkUserOffers($id): bool
     {
-        if (Offers::find()->where(['task_id' => $this->id, 'executor_id' => $id])->one()) {
+        if (
+            Offers::find()->where([
+            'task_id' => $this->id,
+            'executor_id' => $id])
+            ->one()
+        ) {
             return true;
         }
         return false;

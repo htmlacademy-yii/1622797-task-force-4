@@ -1,13 +1,13 @@
 <?php
 
-namespace taskforce\models;
+namespace app\services;
 
-use yii\web\ServerErrorHttpException;
-use yii\web\UploadedFile;
 use app\models\Files;
 use app\models\TasksFiles;
+use yii\web\ServerErrorHttpException;
+use yii\web\UploadedFile;
 
-class SaveFile
+class FileService
 {
     /** Метод загружает файлы в БД
      *
@@ -15,7 +15,7 @@ class SaveFile
      * @return Files|null
      * @throws ServerErrorHttpException
      */
-    public static function uploadNewFile(UploadedFile $file): ?Files
+    public function uploadNewFile(UploadedFile $file): ?Files
     {
         $savedFile = new Files();
         $nameFile = uniqid('taskfile') . '.' . $file->getExtension();
@@ -36,7 +36,7 @@ class SaveFile
      * @return TasksFiles|null
      * @throws ServerErrorHttpException
      */
-    public static function saveTaskFiles(int $fileId, int $taskId): ?TasksFiles
+    public function saveTaskFiles(int $fileId, int $taskId): ?TasksFiles
     {
         $taskFile = new TasksFiles();
         $taskFile->task_id = $taskId;
