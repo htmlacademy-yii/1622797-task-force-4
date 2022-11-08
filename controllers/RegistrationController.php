@@ -2,12 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\forms\RegistrationForm;
+use app\services\RegistrationService;
+use RegistrationUser;
 use Throwable;
 use Yii;
 use yii\base\Exception;
 use yii\web\Response;
-use app\models\forms\RegistrationForm;
-use taskforce\models\RegistrationUser;
 use yii\web\ServerErrorHttpException;
 
 class RegistrationController extends NotSecuredController
@@ -27,7 +28,8 @@ class RegistrationController extends NotSecuredController
         if (Yii::$app->request->getIsPost()) {
             $registrationForm->load(Yii::$app->request->post());
             if ($registrationForm->validate()) {
-                if (!RegistrationUser::registration($registrationForm)) {
+                $registrationService = new RegistrationService();
+                if (!$registrationService->registration($registrationForm)) {
                     throw new ServerErrorHttpException(
                         'Не удалось сохранить данные, попробуйте попытку позже'
                     );

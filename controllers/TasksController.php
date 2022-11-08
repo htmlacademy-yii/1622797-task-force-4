@@ -4,22 +4,20 @@ namespace app\controllers;
 
 use app\models\forms\FeedbackForm;
 use app\models\forms\OffersForm;
+use app\models\forms\TaskCreateForm;
+use app\models\forms\TaskFilterForm;
 use app\models\Offers;
+use app\models\Tasks;
+use app\services\FileService;
+use app\services\TaskCreateService;
 use Exception;
 use taskforce\actions\CancelAction;
-use taskforce\actions\OffersAction;
-use taskforce\actions\RefuseAction;
 use taskforce\actions\RemoveAction;
-use taskforce\actions\StartAction;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
-use app\models\forms\TaskFilterForm;
-use app\models\Tasks;
-use app\models\forms\TaskCreateForm;
-use taskforce\models\TaskCreate;
-use taskforce\models\SaveFile;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
@@ -101,11 +99,9 @@ class TasksController extends SecuredController
             $taskCreateForm->load(Yii::$app->request->post());
 
             if ($taskCreateForm->validate()) {
-                $createdTask = TaskCreate::saveNewTasks($taskCreateForm);
-                foreach (UploadedFile::getInstances($taskCreateForm, 'taskFiles') as $files) {
-                    $savedFile = saveFile::uploadNewFile($files);
-                    saveFile::saveTaskFiles($savedFile->id, $createdTask->id);
-                }
+                $createdTask = new TaskCreateService();
+                $createdTask->saveNewTask($taskCreateForm);
+
                 return $this->redirect(['view', 'id' => $createdTask->id]);
             }
         }
@@ -122,12 +118,12 @@ class TasksController extends SecuredController
         return Yii::$app->response->sendFile(Yii::getAlias('@webroot/uploads/') . $path)->send();
     }
 
-    /** Метод назначает исполнителя для задания
-     *
+    /**
      * @param $taskId
      * @param $userId
      * @return Response
-     * @return \Exception
+     * @throws Throwable
+     * @throws StaleObjectException
      */
     public function actionStart($taskId, $userId): Response
     {
