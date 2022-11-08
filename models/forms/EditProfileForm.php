@@ -66,8 +66,7 @@ class EditProfileForm extends Model
     public function getUser(): array|ActiveRecord|null
     {
         return Users::find()
-            ->with('category')
-            ->where(['user_id' => Yii::$app->user->identity->id])->one();
+            ->where(['id' => Yii::$app->user->identity->id])->one();
     }
 
     /**
@@ -77,14 +76,14 @@ class EditProfileForm extends Model
      */
     public function autocompleteForm($form, $user): void
     {
-        $form->avatar_file_id = Yii::$app->user->identity->avatar_file_id;
+        $form->avatar = Yii::$app->user->identity->avatar_file_id;
         $form->name = Yii::$app->user->identity->name;
         $form->email = Yii::$app->user->identity->email;
         $form->birthday = Yii::$app->user->identity->birthday;
         $form->phone = Yii::$app->user->identity->phone;
         $form->telegram = Yii::$app->user->identity->telegram;
         $form->bio = Yii::$app->user->identity->bio;
-        $form->category = $user->category;
+        $form->category = $user->executorCategories;
     }
 
     /**

@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\forms\FeedbackForm;
 use app\models\forms\OffersForm;
 use app\models\Offers;
+use Exception;
 use taskforce\actions\CancelAction;
 use taskforce\actions\OffersAction;
 use taskforce\actions\RefuseAction;
@@ -126,6 +127,7 @@ class TasksController extends SecuredController
      * @param $taskId
      * @param $userId
      * @return Response
+     * @return \Exception
      */
     public function actionStart($taskId, $userId): Response
     {

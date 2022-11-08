@@ -68,7 +68,7 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
             'inputOptions' => ['style' => 'display: none']])
             ->fileInput(['multiple' => true]); ?>
 
-        <?= Html::SubmitInput('Опубликовать', ['class' => 'button button--blue'])?>
+        <?= Html::SubmitInput('Опубликовать', ['class' => 'button button--blue']); ?>
 
     <?php ActiveForm::end(); ?>
     </div>
