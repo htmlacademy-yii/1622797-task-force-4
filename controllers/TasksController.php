@@ -8,9 +8,7 @@ use app\models\forms\TaskCreateForm;
 use app\models\forms\TaskFilterForm;
 use app\models\Offers;
 use app\models\Tasks;
-use app\services\FileService;
 use app\services\TaskCreateService;
-use Exception;
 use taskforce\actions\CancelAction;
 use taskforce\actions\RemoveAction;
 use Throwable;
@@ -20,7 +18,6 @@ use yii\db\StaleObjectException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\ServerErrorHttpException;
-use yii\web\UploadedFile;
 
 class TasksController extends SecuredController
 {
