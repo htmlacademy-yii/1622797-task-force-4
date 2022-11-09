@@ -5,6 +5,7 @@
  */
 
 use app\models\forms\LoginForm;
+use yii\helpers\Url;
 
 $this->title = 'TaskForce - онлайн площадка для поиска исполнителей на разовые задачи';
 ?>
@@ -16,7 +17,9 @@ $this->title = 'TaskForce - онлайн площадка для поиска и
         <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому гулять с собакой?
             У нас вы быстро найдёте исполнителя для любой жизненной ситуации?<br>
             Быстро, безопасно и с гарантией. Просто, как раз, два, три. </p>
-        <button class="button">Создать аккаунт</button>
+        <a href="<?= Url::toRoute('/registration') ?>">
+            <button class="button">Создать аккаунт</button>
+        </a>
     </div>
     <div class="landing-center">
         <div class="landing-instruction">

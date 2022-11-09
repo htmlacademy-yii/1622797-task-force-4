@@ -83,7 +83,7 @@ class EditProfileForm extends Model
         $form->phone = Yii::$app->user->identity->phone;
         $form->telegram = Yii::$app->user->identity->telegram;
         $form->bio = Yii::$app->user->identity->bio;
-        $form->category = $user->executorCategories;
+        $form->category = $user->category_id;
     }
 
     /**

@@ -28,9 +28,8 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
     </div>
     <div class="my-profile-form">
         <?php $form = ActiveForm::begin([
-            'id' => 'editprofile-form',
             'method' => 'post',
-            'action' => Url::toRoute('tasks/edit')]); ?>
+            'action' => Url::toRoute('user/edit')]); ?>
             <h3 class="head-main head-regular">Мой профиль</h3>
             <div class="photo-editing">
                 <div>
@@ -82,10 +81,10 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
                 <p class="form-label">Выбор специализаций</p>
                 <div class="checkbox-profile">
                     <?= $form->field($editProfileForm, 'category', [
-                        'labelOptions' => ['for' => 'сourier-services',
+                        'labelOptions' => ['for' => 'checkbox-profile',
                             'class' => 'control-label'],
-                        'inputOptions' => ['id' => 'сourier-services']])
-                        ->dropDownList($categoryItems); ?>
+                        'inputOptions' => ['id' => 'checkbox-profile']])
+                        ->checkboxList($categoryItems); ?>
                 </div>
             </div>
 
