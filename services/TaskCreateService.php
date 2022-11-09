@@ -23,6 +23,9 @@ class TaskCreateService
         $task->description = $form->taskDescriptions;
         $task->category_id = $form->category;
         $task->customer_id = Yii::$app->user->identity->id;
+        $task->address = $form->address;
+        $task->latitude = $form->latitude;
+        $task->longitude = $form->longitude;
         $task->budget = $form->budget;
         $task->period_execution = $form->periodExecution;
         $task->save();
