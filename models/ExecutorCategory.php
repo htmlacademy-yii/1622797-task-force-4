@@ -32,9 +32,11 @@ class ExecutorCategory extends ActiveRecord
         return [
             [['category_id', 'user_id'], 'required'],
             [['category_id', 'user_id'], 'integer'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
+            [['user_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['user_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class,
+            [['category_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id']],
         ];
     }

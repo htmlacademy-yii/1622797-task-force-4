@@ -43,7 +43,7 @@ $user = Yii::$app->user->getIdentity();
                 </li>
                 <?php endif; ?>
                 <li class="list-item">
-                    <a href="#" class="link link--nav" >Настройки</a>
+                    <a href="<?= Url::toRoute('/user/edit'); ?>" class="link link--nav" >Настройки</a>
                 </li>
             </ul>
         </div>
@@ -59,7 +59,8 @@ $user = Yii::$app->user->getIdentity();
             <div class="popup-head">
                 <ul class="popup-menu">
                     <li class="menu-item">
-                        <a href="#" class="link">Настройки</a>
+                        <a href="<?= Url::toRoute('/user/edit'); ?>"
+                           class="link">Настройки</a>
                     </li>
                     <li class="menu-item">
                         <a href="#" class="link">Связаться с нами</a>

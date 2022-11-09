@@ -28,10 +28,10 @@ class UserController extends SecuredController
      * @return Response|string
      * @throws ServerErrorHttpException
      */
-    public function actionEdit(): \yii\web\Response|string
+    public function actionEdit(): Response|string
     {
         $editProfileForm = new EditProfileForm();
-        $user = $editProfileForm->getUser();
+        $user = Users::findOne(Yii::$app->user->getId());
         $editProfileForm->autocompleteForm($editProfileForm, $user);
 
         if (Yii::$app->request->getIsPost()) {
@@ -44,6 +44,6 @@ class UserController extends SecuredController
                 return $this->redirect(['view', 'id' => Yii::$app->user->id]);
             }
         }
-        return $this->render('edit-profile', ['editProfileForm' => $editProfileForm]);
+        return $this->render('edit', ['editProfileForm' => $editProfileForm]);
     }
 }
