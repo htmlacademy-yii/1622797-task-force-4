@@ -16,6 +16,9 @@ use yii\db\ActiveRecord;
  * @property string $name
  * @property string|null $description
  * @property int|null $city_id
+ * @property string $address
+ * @property string $latitude
+ * @property string $longitude
  * @property string $date_creation
  * @property int $category_id
  * @property int $customer_id
@@ -55,7 +58,7 @@ class Tasks extends ActiveRecord
     {
         return [
             [['name', 'category_id', 'customer_id', 'status', 'budget', 'period_execution'], 'required'],
-            [['description', 'status'], 'string'],
+            [['description', 'status', 'address', 'latitude', 'longitude'], 'string'],
             [['city_id', 'category_id', 'customer_id', 'executor_id', 'budget'], 'integer'],
             [['date_creation', 'period_execution'], 'safe'],
             [['name'], 'string', 'max' => 255],
@@ -80,6 +83,9 @@ class Tasks extends ActiveRecord
             'name' => 'Name',
             'description' => 'Description',
             'city_id' => 'City ID',
+            'address' => 'Address',
+            'latitude' => 'Latitude',
+            'longitude' => 'Longitude',
             'date_creation' => 'Date Creation',
             'category_id' => 'Category ID',
             'customer_id' => 'Customer ID',

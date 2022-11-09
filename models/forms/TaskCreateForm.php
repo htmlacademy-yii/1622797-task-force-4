@@ -39,7 +39,8 @@ class TaskCreateForm extends Model
         return [
             [['taskName', 'taskDescriptions', 'category'], 'required'],
             ['taskName', 'string', 'min' => 3, 'max' => 255],
-            ['taskDescriptions', 'string', 'min' => 30],
+            ['taskDescriptions', 'min' => 30],
+            ['location', 'string'],
             [['periodExecution'], 'compare', 'compareValue' => date('Y-m-d'),
                 'operator' => '>', 'type' => 'date',
                 'message' => 'Дата выполнения задания не может быть раньше текущей даты'],
