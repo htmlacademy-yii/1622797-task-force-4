@@ -9,15 +9,15 @@ use taskforce\helpers\MainHelpers;
 use yii\helpers\Url;
 use yii\helpers\HtmlPurifier;
 
+$defaultAvatar = '/img/avatars/default-avatar.png';
 ?>
 
 <div class="left-column">
     <h3 class="head-main"><?= HtmlPurifier::process($user->name); ?></h3>
     <div class="user-card">
         <div class="photo-rate">
-            <img class="card-photo" src="<?= (empty(
-                HtmlPurifier::process($user->avatarFile->url)
-            )) ? '' : HtmlPurifier::process($user->avatarFile->url); ?>"
+            <img class="card-photo" src="<?= (empty($user->avatarFile->url)) ?
+                $defaultAvatar : $user->avatarFile->url; ?>"
                  width="191" height="190" alt="Фото пользователя">
             <div class="card-rate">
                 <div class="stars-rating big"><?= StarsWidget::widget(
@@ -47,14 +47,16 @@ use yii\helpers\HtmlPurifier;
             <p class="head-info">Био</p>
             <p class="bio-info"><span class="country-info">Россия</span>,
                 <span class="town-info"><?= !empty($user->city) ?
-                                    $user->city->name . ',' : '' ; ?></span>
-                <span class="age-info"><?= HtmlPurifier::process($user->getUserAge()); ?></span>
+                                    $user->city->name : '' ; ?></span>
+                <?php if ($user->birthday !== null) : ?>
+                <span class="age-info">,<?= HtmlPurifier::process($user->getUserAge()); ?></span>
                 <?= MainHelpers::getNounPluralForm(
                                         $user->getUserAge(),
                                         'год',
                                         'года',
                                         'лет'
                                     ); ?>
+                <?php endif; ?>
             </p>
         </div>
     </div>
@@ -105,15 +107,24 @@ use yii\helpers\HtmlPurifier;
         <ul class="enumeration-list">
             <?php if ($user->phone !== null) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--phone"><?= HtmlPurifier::process($user->phone); ?></a>
+                <a href="tel:<?= $user->phone; ?>"
+                   class="link link--block link--phone">
+                    <?= HtmlPurifier::process($user->phone); ?>
+                </a>
             </li>
             <?php endif; ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--email"><?= HtmlPurifier::process($user->email); ?></a>
+                <a href="mailto:<?= $user->email; ?>"
+                   class="link link--block link--email">
+                    <?= HtmlPurifier::process($user->email); ?>
+                </a>
             </li>
             <?php if ($user->telegram !== null) : ?>
             <li class="enumeration-item">
-                <a href="#" class="link link--block link--tg"><?= HtmlPurifier::process($user->telegram); ?></a>
+                <a href="https://t.me/<?= substr($user->telegram, 1) ?>"
+                   class="link link--block link--tg">
+                    <?= HtmlPurifier::process($user->telegram); ?>
+                </a>
             </li>
             <?php endif; ?>
         </ul>

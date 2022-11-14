@@ -3,11 +3,13 @@
 namespace app\models\forms;
 
 use app\models\Categories;
+use app\models\ExecutorCategory;
 use app\models\Files;
 use app\models\Users;
 use Yii;
 use yii\base\Model;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 use yii\web\ServerErrorHttpException;
 
 class EditProfileForm extends Model
@@ -20,6 +22,7 @@ class EditProfileForm extends Model
     public $telegram;
     public $bio;
     public $category;
+    public $showContacts;
 
     /**
      * @return string[]
@@ -34,88 +37,63 @@ class EditProfileForm extends Model
             'phone' => 'Номер телефона',
             'telegram' => 'Telegram',
             'bio' => 'Информация о себе',
-            'category' => 'Выбор специализаций'
+            'category' => 'Выбор специализаций',
+            'showContacts' => 'Показывать мои контакты только заказчикам, по заданиям которых работаю'
         ];
     }
 
-    /**
-     * @return array
-     */
     public function rules(): array
     {
         return [
             [['name', 'email'], 'required'],
+            [['name'], 'string'],
             [['email'], 'email'],
-            [['bio'], 'string'],
-            [['phone'], 'string', 'max' => 11],
+            [['avatar'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg', 'maxSize' => 5 * 1024 * 1024],
+            [['avatar', 'birthday', 'phone', 'telegram', 'bio', 'category'], 'default', 'value' => null],
+            [['phone'], 'match', 'pattern' => '/^[\d]{11}/i'],
             [['telegram'], 'string', 'max' => 64],
-            [['birthday'], 'date', 'format' => 'php:Y-m-d'],
-            ['category', 'exist', 'targetClass' => Categories::class,
-                'targetAttribute' => ['category' => 'id']],
-            [['avatar'], 'file', 'checkExtensionByMimeType' => true,
-                'extensions' => 'jpg, png',
-                'wrongExtension' => 'Только форматы jpg и png',
-                'targetClass' => Files::class,
-                'targetAttribute' => ['avatar_file_id' => 'id']]
-            ];
+            [['telegram'], 'match', 'pattern' => '/^@\w*$/i', 'message' => 'Телеграм должен начинаться со знака @'],
+            [['bio'], 'string', 'max' => 2000],
+            ['showContacts', 'boolean']
+        ];
     }
 
     /**
-     * @return array|ActiveRecord|null
-     */
-    public function getUser(): array|ActiveRecord|null
-    {
-        return Users::find()
-            ->where(['id' => Yii::$app->user->identity->id])->one();
-    }
-
-    /**
-     * @param $form
-     * @param $user
-     * @return void
-     */
-    public function autocompleteForm($form, $user): void
-    {
-        $form->avatar = Yii::$app->user->identity->avatar_file_id;
-        $form->name = Yii::$app->user->identity->name;
-        $form->email = Yii::$app->user->identity->email;
-        $form->birthday = Yii::$app->user->identity->birthday;
-        $form->phone = Yii::$app->user->identity->phone;
-        $form->telegram = Yii::$app->user->identity->telegram;
-        $form->bio = Yii::$app->user->identity->bio;
-        $form->category = $user->category_id;
-    }
-
-    /**
-     * @param $user
      * @return void
      * @throws ServerErrorHttpException
+     * @throws Exception
      */
-    public function setUser($user): void
+    public function setUser(): void
     {
-        if (!$this->uploadAvatar($user) && $this->avatar) {
+        $user = Users::findOne(Yii::$app->user->getId());
+
+        if (!$this->uploadAvatar() && $this->avatar) {
             throw new ServerErrorHttpException('Загрузить файл не удалось');
         }
+
         $user->name = $this->name;
         $user->email = $this->email;
         $user->birthday = $this->birthday;
         $user->phone = $this->phone;
         $user->telegram = $this->telegram;
         $user->bio = $this->bio;
-        $user->executorCategories = $this->category;
+
+        if (!empty($user->executorCategories)) {
+            $this->loadUserCategory();
+        }
+        $user->show_contacts = $this->showContacts;
+
         $user->save();
     }
 
     /**
-     * @param $user
      * @return bool
      * @throws ServerErrorHttpException
      */
-    public function uploadAvatar($user): bool
+    public function uploadAvatar(): bool
     {
         if ($this->validate() && $this->avatar) {
             $avatarName = uniqid('avatar') . '.' . $this->avatar->getExtension();
-            $user->avatar_file_id = $avatarName;
 
             if (!$this->avatar->saveAs('@webroot/uploads/avatar' . $avatarName)) {
                 throw new ServerErrorHttpException('Ошибка загрузки аватара');
@@ -123,5 +101,22 @@ class EditProfileForm extends Model
             return true;
         }
         return false;
+    }
+
+    /** Метод загружает категории пользователя
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function loadUserCategory(): void
+    {
+        ExecutorCategory::deleteExecutorCategories();
+
+        foreach ($this->category as $category) {
+            $userCategory = new ExecutorCategory();
+            $userCategory->user_id = Yii::$app->user->getId();
+            $userCategory->category_id = $category;
+            $userCategory->save();
+        }
     }
 }

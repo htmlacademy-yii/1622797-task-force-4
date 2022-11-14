@@ -14,6 +14,9 @@ class TaskCreateForm extends Model
     public $budget;
     public $periodExecution;
     public $taskFiles;
+    public $latitude;
+    public $longitude;
+    public $city;
 
     /**
      * @return string[]
@@ -39,15 +42,15 @@ class TaskCreateForm extends Model
         return [
             [['taskName', 'taskDescriptions', 'category'], 'required'],
             ['taskName', 'string', 'min' => 3, 'max' => 255],
-            ['taskDescriptions', 'min' => 30],
-            ['location', 'string'],
+            ['taskDescriptions', 'string', 'min' => 30],
             [['periodExecution'], 'compare', 'compareValue' => date('Y-m-d'),
                 'operator' => '>', 'type' => 'date',
                 'message' => 'Дата выполнения задания не может быть раньше текущей даты'],
-            ['category', 'exist', 'targetClass' => Categories::class,
+            [['category'], 'exist', 'targetClass' => Categories::class,
                 'targetAttribute' => ['category' => 'id']],
             ['budget', 'integer', 'min' => 1],
             [['taskFiles'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 0],
+            [['location', 'latitude', 'longitude', 'city'], 'safe']
         ];
     }
 }

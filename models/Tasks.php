@@ -5,7 +5,6 @@ namespace app\models;
 use taskforce\actions\CancelAction;
 use taskforce\actions\CompleteAction;
 use taskforce\actions\OffersAction;
-use taskforce\actions\RemoveAction;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -203,7 +202,7 @@ class Tasks extends ActiveRecord
         switch ($this->status) {
             case self::STATUS_NEW:
                 if ($userId === $this->customer_id) {
-                    return [new RemoveAction()];
+                    return [new CancelAction()];
                 } elseif ($user->is_executor === 1) {
                     return [new OffersAction()];
                 }
@@ -236,5 +235,74 @@ class Tasks extends ActiveRecord
             return true;
         }
         return false;
+    }
+
+    /** Метод получает название категорий заданий для пользователей
+     *
+     * @return string[]
+     */
+    public static function getStatusesLabels(): array
+    {
+        return [
+            self::STATUS_NEW => 'Новые задание',
+            self::STATUS_AT_WORK => 'Задания в процессе',
+            self::STATUS_DONE => 'Закрытые задания',
+            self::STATUS_FAILED => 'Просрочено',
+        ];
+    }
+
+    /** Метод получает все новые задачи Заказчика
+     *
+     * @param $userId
+     * @return ActiveQuery
+     */
+    public function getNewCustomerTasks($userId): ActiveQuery
+    {
+        $tasksQuery = Tasks::find();
+        return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_NEW]);
+    }
+
+    /** Метод получает все задачи в работе в Исполнителя или Заказчика
+     *
+     * @param $userId
+     * @return ActiveQuery
+     */
+    public function getInWorkTasks($userId): ActiveQuery
+    {
+        $tasksQuery = Tasks::find();
+        if ($userId->is_executor !== 1) {
+            return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+        } else {
+            return $tasksQuery->where(['executor_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+        }
+    }
+
+    /** Метод получает закрытые и проваленные задачи для Исполнителя и Заказчика
+     *
+     * @param $userId
+     * @return ActiveQuery
+     */
+    public function getDoneTasks($userId): ActiveQuery
+    {
+        $tasksQuery = Tasks::find();
+        if ($userId->is_executor !== 1) {
+            return $tasksQuery->where(['customer_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_FAILED, Tasks::STATUS_DONE,
+                    Tasks::STATUS_CANCELLED]);
+        } else {
+            return $tasksQuery->where(['executor_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_DONE, Tasks::STATUS_FAILED]);
+        }
+    }
+
+    /** Метод получает просроченные задачи Исполнителя
+     *
+     * @param $userId
+     * @return ActiveQuery
+     */
+    public function getDeadlineExecutorTasks($userId): ActiveQuery
+    {
+        $tasksQuery = Tasks::find();
+        return $tasksQuery->where(['executor_id' => $userId])->andWhere(['period_execution' < 'NOW()']);
     }
 }
