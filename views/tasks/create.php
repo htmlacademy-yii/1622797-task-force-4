@@ -42,9 +42,13 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
                 ->dropDownList($categoryItems); ?>
         </div>
         <div class="form-group">
-            <label class="control-label" for="location">Локация</label>
-            <input class="location-icon" id="location" type="text">
-            <span class="help-block">Error description is here</span>
+            <?= $form->field($taskCreateForm, 'location', [
+                'labelOptions' => ['for' => 'location',
+                    'class' => 'control-label'],
+                'inputOptions' => ['id' => 'location']])
+                ->textInput(['class' => 'location-icon']); ?>
+            <?= $form->field($taskCreateForm, 'latitude', ['template' => '{input}'])->hiddenInput(); ?>
+            <?= $form->field($taskCreateForm, 'longitude', ['template' => '{input}'])->hiddenInput(); ?>
         </div>
         <div class="half-wrapper">
             <div class="form-group">

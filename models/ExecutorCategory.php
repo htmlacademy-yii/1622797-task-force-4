@@ -2,8 +2,10 @@
 
 namespace app\models;
 
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "executorCategory".
@@ -70,5 +72,16 @@ class ExecutorCategory extends ActiveRecord
     public function getUser(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'user_id']);
+    }
+
+    /** Метод очищает категории исполнителя, если аккаунт новый
+     *
+     * @return void
+     * @throws Exception
+     */
+    public static function deleteExecutorCategories(): void
+    {
+        Yii::$app->db->createCommand()->delete('executorCategory', [
+            'user_id' => Yii::$app->user->getId()])->query();
     }
 }

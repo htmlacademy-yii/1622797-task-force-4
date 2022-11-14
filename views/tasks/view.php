@@ -16,6 +16,7 @@ use yii\helpers\Url;
 use yii\helpers\HtmlPurifier;
 use app\widgets\ActionsWidget;
 
+$defaultAvatar = '/img/avatars/default-avatar.png';
 ?>
 
 <div class="left-column">
@@ -29,19 +30,33 @@ use app\widgets\ActionsWidget;
             <?= $actionObject !== null ? ActionsWidget::widget(['actionObject' => $actionObject]) : '' ; ?>
         <?php endforeach; ?>
     <?php endif; ?>
+    <?php if ($task->latitude && $task->longitude) : ?>
     <div class="task-map">
-        <img class="map" src="../../img/map.png" width="725" height="346" alt="Новый арбат, 23, к. 1">
-        <p class="map-address town">Москва</p>
-        <p class="map-address">Новый арбат, 23, к. 1</p>
+        <div class="map" style="width: 725px; height: 346px" id="map"></div>
+            <script type="text/javascript">
+                ymaps.ready(init);
+                function init(){
+                    var myMap = new ymaps.Map("map", {
+                        center: [<?= $task->latitude; ?>, <?= $task->longitude; ?>],
+                        zoom: 14
+                    });
+                }
+            </script>
+        <input type="hidden" id="latitude" value="<?= HTML::encode($task->latitude); ?>">
+        <input type="hidden" id="longitude" value="<?= HTML::encode($task->longitude); ?>">
+        <p class="map-address town"><?= $task->city->name; ?></p>
+        <p class="map-address"><?= $task->address; ?></p>
     </div>
+    <?php endif; ?>
     <?php if ($user->id === $task->customer_id || $user->is_executor === 1) : ?>
     <h4 class="head-regular">Отклики на задание</h4>
         <?php foreach ($task->offers as $response) : ?>
             <?php if ($user->id === $task->customer_id || $user->id === $response->executor_id) : ?>
         <div class="response-card">
             <img class="customer-photo" src="<?=
-            (empty($response->executor->avatarFile->url)) ? '' : $response->executor->avatarFile->url; ?>"
-                 width="146" height="156" alt="Фото заказчиков">
+            (empty($response->executor->avatarFile->url)) ?
+                $defaultAvatar : $response->executor->avatarFile->url; ?>"
+                 width="146" height="156" alt="Фото пользователя">
             <div class="feedback-wrapper">
                 <a href="<?= Url::toRoute(['user/view','id' => $response->executor->id]); ?>"
                    class="link link--block link--big"><?= HtmlPurifier::process($response->executor->name); ?></a>
@@ -123,5 +138,4 @@ use app\widgets\ActionsWidget;
     <?php echo $this->render('offers', ['task' => $task, 'newOffers' => $newOffers]); ?>
     <?php echo $this->render('feedback', ['task' => $task, 'feedbackForm' => $feedbackForm]); ?>
     <?php echo $this->render('cancel', ['task' => $task]); ?>
-    <?php echo $this->render('remove', ['task' => $task]); ?>
 </div>

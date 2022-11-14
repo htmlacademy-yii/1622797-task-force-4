@@ -7,12 +7,11 @@ use Yii;
 use yii\base\Exception;
 use yii\base\Model;
 
-class EditPasswordForm extends Model
+class SecurityForm extends Model
 {
     public $currentPassword;
     public $newPassword;
     public $repeatNewPassword;
-    public $showContacts;
 
     /**
      * @return string[]
@@ -22,8 +21,7 @@ class EditPasswordForm extends Model
         return [
             'currentPassword' => 'Старый пароль',
             'newPassword' => 'Новый пароль',
-            'repeatNewPassword' => 'Повторите новый пароль',
-            'showContacts' => 'Показывать контактные данные только заказчику'
+            'repeatNewPassword' => 'Повторите новый пароль'
         ];
     }
 
@@ -33,12 +31,11 @@ class EditPasswordForm extends Model
     public function rules(): array
     {
         return [
-            [['currentPassword'], 'required'],
+            [['currentPassword', 'newPassword', 'repeatNewPassword'], 'required'],
             [['currentPassword', 'newPassword', 'repeatNewPassword'], 'string',
                 'min' => 6, 'max' => 64],
             [['currentPassword'], 'validatePassword'],
-            [['newPasswordRepeat'], 'compare', 'compareAttribute' => 'newPassword'],
-            [['showContacts'], 'boolean']
+            [['repeatNewPassword'], 'compare', 'compareAttribute' => 'newPassword']
         ];
     }
 
@@ -47,12 +44,12 @@ class EditPasswordForm extends Model
      * @param $attribute
      * @return void
      */
-    public function validatePassword($attribute): void
+    public function validatePassword($attribute, $params): void
     {
         if (!$this->hasErrors()) {
             $user = Users::findOne(['id' => Yii::$app->user->identity->id]);
-            if (!$user || !$user->validatePassword($this->currentPassword)) {
-                $this->addErrors($attribute, 'Неверный пароль');
+            if (!$user || !Yii::$app->security->validatePassword($this->currentPassword, $user->password)) {
+                $this->addError($attribute, 'Неверный пароль');
             }
         }
     }
@@ -62,16 +59,14 @@ class EditPasswordForm extends Model
      * @return bool
      * @throws Exception
      */
-    public function changeSettings(): bool
+    public function changePassword(): bool
     {
         $currentUser = Yii::$app->user->identity->id;
-        $user = Users::findOne($currentUser->id);
+        $user = Users::findOne($currentUser);
 
         if ($this->newPassword) {
             $user->password = Yii::$app->getSecurity()->generatePasswordHash($this->newPassword);
         }
-
-        $user->show_contacts = $this->showContacts;
 
         return $user->save();
     }

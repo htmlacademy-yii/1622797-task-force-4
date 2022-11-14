@@ -18,6 +18,18 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '40e88_N9v_NFGu7Ri2PgBGHMGlWFoRjk',
         ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'vkontakte' => [
+                    'class' => 'yii\authclient\clients\VKontakte',
+                    'clientId' => '51476034',
+                    'clientSecret' => 'zMzWEUXdAyM8QCyPepp4',
+                    'returnUrl' => 'http://taskforce/landing/auth',
+                    'scope' => 'email',
+                ],
+            ],
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],

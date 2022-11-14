@@ -5,6 +5,7 @@
  */
 
 use app\models\Categories;
+use app\models\Users;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -12,20 +13,14 @@ use yii\widgets\ActiveForm;
 
 $this->title = 'Мой профиль';
 $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
+$user = Users::findOne(Yii::$app->user->getId());
+$defaultAvatar = '/img/avatars/default-avatar.png';
 ?>
 
 <main class="main-content main-content--left container">
-    <div class="left-menu left-menu--edit">
-        <h3 class="head-main head-task">Настройки</h3>
-        <ul class="side-menu-list">
-            <li class="side-menu-item side-menu-item--active">
-                <a class="link link--nav">Мой профиль</a>
-            </li>
-            <li class="side-menu-item">
-                <a href="#" class="link link--nav">Безопасность</a>
-            </li>
-        </ul>
-    </div>
+
+    <?= $this->render('menu'); ?>
+
     <div class="my-profile-form">
         <?php $form = ActiveForm::begin([
             'method' => 'post',
@@ -34,59 +29,54 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
             <div class="photo-editing">
                 <div>
                     <p class="form-label">Аватар</p>
-                    <img class="avatar-preview" src="../img/man-glasses.png" width="83" height="83">
+                    <img class="avatar-preview" src="<?= (empty($user->avatarFile->url)) ?
+                        $defaultAvatar : $user->avatarFile->url; ?>" width="83" height="83">
                 </div>
+                <?= $form->field($editProfileForm, 'avatar', [
+                    'template' => "<label class=\"button button--black\">Сменить аватар{input}",
+                    'inputOptions' => ['style' => 'display: none', 'hidden' => true],
+                ])->fileInput(); ?>
             </div>
-            <div class="form-group">
                 <?= $form->field($editProfileForm, 'name', [
                     'labelOptions' => ['for' => 'profile-name',
                         'class' => 'control-label'],
                     'inputOptions' => ['id' => 'profile-name']]); ?>
-            </div>
             <div class="half-wrapper">
-                <div class="form-group">
                     <?= $form->field($editProfileForm, 'email', [
                         'labelOptions' => ['for' => 'profile-email',
-                            'class' => 'control-label'],
-                        'inputOptions' => ['id' => 'profile-email']]); ?>
-                </div>
-                <div class="form-group">
+                            'class' => 'control-label']]); ?>
                     <?= $form->field($editProfileForm, 'birthday', [
                         'labelOptions' => ['for' => 'profile-date',
                             'class' => 'control-label'],
                         'inputOptions' => ['id' => 'profile-date']])->input('date'); ?>
-                </div>
             </div>
             <div class="half-wrapper">
-                <div class="form-group">
-                    <?= $form->field($editProfileForm, 'phone', [
+                <?= $form->field($editProfileForm, 'phone', [
                         'labelOptions' => ['for' => 'profile-phone',
                             'class' => 'control-label'],
                         'inputOptions' => ['id' => 'profile-phone']]); ?>
-                </div>
-                <div class="form-group">
-                    <?= $form->field($editProfileForm, 'telegram', [
+                <?= $form->field($editProfileForm, 'telegram', [
                         'labelOptions' => ['for' => 'profile-tg',
                             'class' => 'control-label'],
                         'inputOptions' => ['id' => 'profile-tg']]); ?>
-                </div>
             </div>
-            <div class="form-group">
                 <?= $form->field($editProfileForm, 'bio', [
                     'labelOptions' => ['for' => 'profile-info',
                         'class' => 'control-label'],
                     'inputOptions' => ['id' => 'profile-info']]); ?>
-            </div>
-            <div class="form-group">
-                <p class="form-label">Выбор специализаций</p>
-                <div class="checkbox-profile">
-                    <?= $form->field($editProfileForm, 'category', [
-                        'labelOptions' => ['for' => 'checkbox-profile',
-                            'class' => 'control-label'],
-                        'inputOptions' => ['id' => 'checkbox-profile']])
-                        ->checkboxList($categoryItems); ?>
-                </div>
-            </div>
+        <?php if ($user->is_executor === 1) : ?>
+                <?= $form->field($editProfileForm, 'category')->checkboxList(
+                    $categoryItems,
+                    ['class' => 'form-group checkbox-profile control-label']
+                ) ?>
+                <?= $form->field(
+                    $editProfileForm,
+                    'showContacts',
+                    [
+                        'options' => ['class' => 'form-group']]
+                )
+                ->checkbox(['class' => 'control-label checkbox-label']); ?>
+        <?php endif; ?>
 
         <?= Html::SubmitInput('Сохранить', ['class' => 'button button--blue']); ?>
 

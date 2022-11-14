@@ -8,9 +8,9 @@ use app\models\forms\TaskCreateForm;
 use app\models\forms\TaskFilterForm;
 use app\models\Offers;
 use app\models\Tasks;
+use app\services\GeocoderService;
 use app\services\TaskCreateService;
 use taskforce\actions\CancelAction;
-use taskforce\actions\RemoveAction;
 use Throwable;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -96,10 +96,16 @@ class TasksController extends SecuredController
             $taskCreateForm->load(Yii::$app->request->post());
 
             if ($taskCreateForm->validate()) {
-                $createdTask = new TaskCreateService();
-                $createdTask->saveNewTask($taskCreateForm);
+                $geocoder = new GeocoderService();
+                $taskCreateForm->latitude = $geocoder->getLatitude($taskCreateForm->location);
+                $taskCreateForm->longitude = $geocoder->getLongitude($taskCreateForm->location);
+                $taskCreateForm->location = $geocoder->getAddress($taskCreateForm->location);
+                $taskCreateForm->city = $geocoder->getCity($taskCreateForm->location);
 
-                return $this->redirect(['view', 'id' => $createdTask->id]);
+                $createdTask = new TaskCreateService();
+                $taskId = $createdTask->saveNewTask($taskCreateForm);
+
+                return $this->redirect(['tasks/view', 'id' => $taskId]);
             }
         }
         return $this->render('create', ['taskCreateForm' => $taskCreateForm]);
@@ -185,17 +191,17 @@ class TasksController extends SecuredController
         return $this->redirect('/tasks');
     }
 
-    /** Метод для отмены задания его владельцом
-     *
+    /**
      * @param $id
      * @return Response
+     * @throws Throwable
      */
     public function actionRemove($id): Response
     {
         $task = Tasks::findOne($id);
-        $action = new RemoveAction();
+        $action = new CancelAction();
 
-        if ($action->rightsCheck($task, Yii::$app->user->identity->id)) {
+        if ($action->rightsCheckCustomer($task, Yii::$app->user->identity->id)) {
             $action->removeTask($id);
 
             return $this->redirect(Yii::$app->request->referrer);
@@ -203,21 +209,63 @@ class TasksController extends SecuredController
         return $this->redirect('/tasks');
     }
 
-    /** Метод для отказа от задания исполнителем
-     *
+    /**
      * @param $id
      * @return Response
+     * @throws StaleObjectException
+     * @throws Throwable
      */
-    public function actionCancel($id)
+    public function actionCancel($id): Response
     {
         $task = Tasks::findOne($id);
         $action = new CancelAction();
 
-        if ($action->rightsCheck($task, Yii::$app->user->identity->id)) {
+        if ($action->rightsCheck($task, Yii::$app->user->getId())) {
             $action->cancelTask($id);
 
             return $this->redirect(Yii::$app->request->referrer);
         }
         return $this->redirect('/tasks');
+    }
+
+    /** Метод отвечает за отрисовку страницы Мои задания
+     *
+     * @param string $status
+     * @return string
+     */
+    public function actionMyTasks(string $status): string
+    {
+        $user = Yii::$app->user->getId();
+        $taskQuery = new Tasks();
+
+        if ($status === Tasks::STATUS_NEW) {
+            $taskQuery->getNewCustomerTasks($user);
+        }
+        if ($status === Tasks::STATUS_AT_WORK) {
+            $taskQuery->getInWorkTasks($user);
+        }
+        if ($status === Tasks::STATUS_DONE) {
+            $taskQuery->getDoneTasks($user);
+        }
+        if ($status === Tasks::STATUS_FAILED) {
+            $taskQuery->getDeadlineExecutorTasks($user);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $taskQuery,
+            'pagination' => [
+                'pageSize' => 5,
+                'pageSizeParam' => false
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'date_creation' => SORT_DESC,
+                ]
+            ],
+        ]);
+
+        return $this->render('my-tasks', [
+            'dataProvider' => $dataProvider,
+            'status' => $status]);
     }
 }

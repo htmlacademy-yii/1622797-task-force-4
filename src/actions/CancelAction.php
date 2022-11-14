@@ -3,7 +3,9 @@
 namespace taskforce\actions;
 
 use app\models\Tasks;
+use Throwable;
 use Yii;
+use yii\db\StaleObjectException;
 
 class CancelAction extends AbstractAction
 {
@@ -25,11 +27,38 @@ class CancelAction extends AbstractAction
         return false;
     }
 
-    public function cancelTask($task)
+    public function rightsCheckCustomer(Tasks $task, int $userId): bool
+    {
+        if ($task->status === Tasks::STATUS_NEW && $task->customer_id === $userId) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $task
+     * @return void
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
+    public function cancelTask($task): void
     {
         $task = Tasks::findOne($task);
         $task->status = Tasks::STATUS_FAILED;
         $task->executor_id = Yii::$app->user->identity->id;
+        $task->update();
+    }
+
+    /**
+     * @param $task
+     * @return void
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function removeTask($task): void
+    {
+        $task = Tasks::findOne($task);
+        $task->status = Tasks::STATUS_CANCELLED;
         $task->update();
     }
 }

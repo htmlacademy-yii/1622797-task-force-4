@@ -29,6 +29,7 @@ use yii\web\IdentityInterface;
  * @property string $status
  * @property int $is_executor
  * @property int $show_contacts
+ * @property int $vk_id
  *
  * @property Files $avatarFile
  * @property Cities $city
@@ -60,7 +61,7 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return [
             [['name', 'email', 'password', 'city_id', 'is_executor'], 'required'],
-            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor', 'show_contacts'], 'integer'],
+            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor', 'show_contacts', 'vk_id'], 'integer'],
             [['date_creation', 'birthday'], 'safe'],
             [['bio', 'status'], 'string'],
             [['name', 'email'], 'string', 'max' => 255],
@@ -95,7 +96,8 @@ class Users extends ActiveRecord implements IdentityInterface
             'bio' => 'Bio',
             'status' => 'Status',
             'is_executor' => 'Is Executor',
-            'show_contacts' => 'Show Contacts'
+            'show_contacts' => 'Show Contacts',
+            'vk_id' => 'VK id'
         ];
     }
 

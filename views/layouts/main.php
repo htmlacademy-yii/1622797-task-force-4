@@ -10,6 +10,7 @@ use yii\helpers\HtmlPurifier;
 
 MainAsset::register($this);
 $user = Yii::$app->user->getIdentity();
+$defaultAvatar = '/img/avatars/default-avatar.png';
 ?>
 
 <?php $this->beginPage(); ?>
@@ -18,6 +19,10 @@ $user = Yii::$app->user->getIdentity();
 <head>
     <title><?= Html::encode($this->title); ?></title>
     <?php $this->head(); ?>
+    <script src=
+            "https://api-maps.yandex.ru/2.1/?apikey=a3f42aa0-e7e6-4132-bec6-856c58de44df&lang=ru_RU"
+            type="text/javascript">
+    </script>
 </head>
 
 <body>
@@ -35,7 +40,7 @@ $user = Yii::$app->user->getIdentity();
                     <a class="link link--nav">Новое</a>
                 </li>
                 <li class="list-item">
-                    <a href="#" class="link link--nav" >Мои задания</a>
+                    <a href="<?= Url::toRoute('/tasks/my-tasks'); ?>" class="link link--nav" >Мои задания</a>
                 </li>
                 <?php if ($user->is_executor !== 1) : ?>
                 <li class="list-item">
@@ -51,8 +56,9 @@ $user = Yii::$app->user->getIdentity();
     </nav>
     <?php if (!Yii::$app->user->isGuest) : ?>
     <div class="user-block">
-        <a href="#">
-            <img class="user-photo" src="#" width="55" height="55" alt="Аватар">
+        <a href="<?= Url::toRoute(['user/view', 'id' => Yii::$app->user->identity->id]); ?>">
+            <img class="user-photo" src="<?= (empty($user->avatarFile->url)) ?
+                $defaultAvatar : $user->avatarFile->url; ?>" width="55" height="55" alt="Аватар">
         </a>
         <div class="user-menu">
             <p class="user-name"><?= HtmlPurifier::process(Yii::$app->user->getIdentity()->name); ?></p>
