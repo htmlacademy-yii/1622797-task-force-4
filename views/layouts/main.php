@@ -4,9 +4,10 @@
 /** @var string $content */
 
 use app\assets\MainAsset;
+use app\models\Tasks;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
-use yii\helpers\HtmlPurifier;
+use yii\widgets\Menu;
 
 MainAsset::register($this);
 $user = Yii::$app->user->getIdentity();
@@ -30,49 +31,63 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
 
 <header class="page-header">
     <nav class="main-nav">
-        <a href="<?= Url::toRoute('/tasks'); ?>" class="header-logo">
-            <img class="logo-image" src="/img/logotype.png" width=227 height=60 alt="taskforce">
+        <a href="<?= Url::to('/tasks'); ?>" class="header-logo">
+            <img class="logo-image" src="/img/logotype.png" width=227 height=60
+                 alt="taskforce">
         </a>
         <?php if (!Yii::$app->user->isGuest) : ?>
         <div class="nav-wrapper">
-            <ul class="nav-list">
-                <li class="list-item list-item--active">
-                    <a class="link link--nav">Новое</a>
-                </li>
-                <li class="list-item">
-                    <a href="<?= Url::toRoute('/tasks/my-tasks'); ?>" class="link link--nav" >Мои задания</a>
-                </li>
-                <?php if ($user->is_executor !== 1) : ?>
-                <li class="list-item">
-                    <a href="<?= Url::toRoute('/tasks/create'); ?>" class="link link--nav" >Создать задание</a>
-                </li>
-                <?php endif; ?>
-                <li class="list-item">
-                    <a href="<?= Url::toRoute('/user/edit'); ?>" class="link link--nav" >Настройки</a>
-                </li>
-            </ul>
+            <?= Menu::widget([
+                'items' => [
+                    ['label' => 'Новое', 'url' => ['tasks/index']],
+                    ['label' => 'Мои задания', 'url' => ['tasks/my-tasks',
+                        'status' => Tasks::STATUS_NEW],
+                        'visible' => !Yii::$app->user->identity->is_executor == 1],
+                    ['label' => 'Мои задания', 'url' => ['tasks/my-tasks',
+                        'status' => Tasks::STATUS_AT_WORK],
+                        'visible' => Yii::$app->user->identity->is_executor == 1],
+                    ['label' => 'Создать задание', 'url' => ['tasks/create'],
+                        'visible' => !Yii::$app->user->identity->is_executor == 1],
+                    ['label' => 'Настройки', 'url' => ['user/edit']],
+                ],
+                'options' => [
+                    'class' => 'nav-list'
+                ],
+                'itemOptions' => [
+                    'class' => 'list-item'
+                ],
+                'linkTemplate' => '<a href="{url}" class="link link--nav">{label}</a>',
+                'activateItems' => true,
+                'activateParents' => true,
+                'activeCssClass' => 'list-item--active',
+            ]);
+            ?>
         </div>
         <?php endif; ?>
     </nav>
     <?php if (!Yii::$app->user->isGuest) : ?>
     <div class="user-block">
-        <a href="<?= Url::toRoute(['user/view', 'id' => Yii::$app->user->identity->id]); ?>">
-            <img class="user-photo" src="<?= (empty($user->avatarFile->url)) ?
-                $defaultAvatar : $user->avatarFile->url; ?>" width="55" height="55" alt="Аватар">
+        <a href="<?= Url::toRoute(['user/view',
+            'id' => Yii::$app->user->identity->id]); ?>">
+            <img class="user-photo" src="<?= Html::encode(empty($user->avatar) ?
+                $defaultAvatar : $user->avatar); ?>" width="55"
+                 height="55" alt="Аватар">
         </a>
         <div class="user-menu">
-            <p class="user-name"><?= HtmlPurifier::process(Yii::$app->user->getIdentity()->name); ?></p>
+            <p class="user-name">
+                <?= Html::encode(Yii::$app->user->identity->name); ?>
+            </p>
             <div class="popup-head">
                 <ul class="popup-menu">
                     <li class="menu-item">
-                        <a href="<?= Url::toRoute('/user/edit'); ?>"
+                        <a href="<?= Url::to('/user/edit'); ?>"
                            class="link">Настройки</a>
                     </li>
                     <li class="menu-item">
-                        <a href="#" class="link">Связаться с нами</a>
+                        <a href="mailto:mail@taskforce.com" class="link">Связаться с нами</a>
                     </li>
                     <li class="menu-item">
-                        <a href="<?= Url::toRoute('/landing/logout') ;?>"
+                        <a href="<?= Url::to('/landing/logout') ;?>"
                            class="link">Выход из системы</a>
                     </li>
 

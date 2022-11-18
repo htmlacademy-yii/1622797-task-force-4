@@ -22,7 +22,7 @@ class m221005_160544_create_users_table extends Migration
                 ->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
             'rating' => $this->tinyInteger()->defaultValue(0),
             'popularity' => $this->integer()->defaultValue(0),
-            'avatar_file_id' => $this->integer()->notNull(),
+            'avatar' => $this->string(255)->null(),
             'birthday' => $this->dateTime(),
             'phone' => $this->string(32),
             'telegram' => $this->string(64),
@@ -31,15 +31,6 @@ class m221005_160544_create_users_table extends Migration
             'status' => $this->string(20)->notNull(),
             'is_executor' => $this->boolean()->notNull()
         ]);
-
-        $this->addForeignKey(
-            'users_to_files',
-            'users',
-            'avatar_file_id',
-            'files',
-            'id',
-            'CASCADE'
-        );
 
         $this->addForeignKey(
             'users_to_cities',
@@ -57,7 +48,6 @@ class m221005_160544_create_users_table extends Migration
     public function safeDown()
     {
         $this->dropTable('{{%users}}');
-        $this->dropForeignKey('users_to_file', 'users');
         $this->dropForeignKey('users_to_cities', 'users');
     }
 }

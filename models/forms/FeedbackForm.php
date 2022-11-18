@@ -36,9 +36,11 @@ class FeedbackForm extends Model
 
     public function createFeedback()
     {
-        $feedback = new Feedback();
         $task = Tasks::findOne(['id' => $this->taskId]);
         $task->status = Tasks::STATUS_DONE;
+        $task->save(false);
+
+        $feedback = new Feedback();
         $feedback->customer_id = Yii::$app->user->identity->id;
         $feedback->executor_id = $task->executor_id;
         $feedback->task_id = $this->taskId;

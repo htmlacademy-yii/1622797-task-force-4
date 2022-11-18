@@ -26,19 +26,4 @@ class m221109_152634_add_column_address_lat_long_tasks_table extends Migration
 
         return false;
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m221109_152634_add_column_address_lat_long_tasks_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

@@ -56,18 +56,25 @@ class Tasks extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'category_id', 'customer_id', 'status', 'budget', 'period_execution'], 'required'],
-            [['description', 'status', 'address', 'latitude', 'longitude'], 'string'],
-            [['city_id', 'category_id', 'customer_id', 'executor_id', 'budget'], 'integer'],
+            [['name', 'category_id', 'customer_id', 'status', 'budget',
+                'period_execution'], 'required'],
+            [['description', 'status', 'address', 'latitude',
+                'longitude'], 'string'],
+            [['city_id', 'category_id', 'customer_id', 'executor_id',
+                'budget'], 'integer'],
             [['date_creation', 'period_execution'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
+            [['customer_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['customer_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
+            [['executor_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class,
+            [['category_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class,
+            [['city_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id']],
         ];
     }
@@ -259,7 +266,8 @@ class Tasks extends ActiveRecord
     public function getNewCustomerTasks($userId): ActiveQuery
     {
         $tasksQuery = Tasks::find();
-        return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_NEW]);
+        return $tasksQuery->where(['customer_id' => $userId])
+            ->andWhere(['status' => Tasks::STATUS_NEW]);
     }
 
     /** Метод получает все задачи в работе в Исполнителя или Заказчика
@@ -271,9 +279,11 @@ class Tasks extends ActiveRecord
     {
         $tasksQuery = Tasks::find();
         if ($userId->is_executor !== 1) {
-            return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+            return $tasksQuery->where(['customer_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_AT_WORK]);
         } else {
-            return $tasksQuery->where(['executor_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+            return $tasksQuery->where(['executor_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_AT_WORK]);
         }
     }
 
@@ -287,11 +297,11 @@ class Tasks extends ActiveRecord
         $tasksQuery = Tasks::find();
         if ($userId->is_executor !== 1) {
             return $tasksQuery->where(['customer_id' => $userId])
-                ->andWhere(['status' => Tasks::STATUS_FAILED, Tasks::STATUS_DONE,
-                    Tasks::STATUS_CANCELLED]);
+                ->andWhere(['status' => [Tasks::STATUS_FAILED, Tasks::STATUS_DONE,
+                    Tasks::STATUS_CANCELLED]]);
         } else {
             return $tasksQuery->where(['executor_id' => $userId])
-                ->andWhere(['status' => Tasks::STATUS_DONE, Tasks::STATUS_FAILED]);
+                ->andWhere(['status' => [Tasks::STATUS_DONE, Tasks::STATUS_FAILED]]);
         }
     }
 
@@ -303,6 +313,7 @@ class Tasks extends ActiveRecord
     public function getDeadlineExecutorTasks($userId): ActiveQuery
     {
         $tasksQuery = Tasks::find();
-        return $tasksQuery->where(['executor_id' => $userId])->andWhere(['period_execution' < 'NOW()']);
+        return $tasksQuery->where(['executor_id' => $userId])
+            ->andWhere(['period_execution' => '< NOW()']);
     }
 }

@@ -21,7 +21,7 @@ use yii\web\IdentityInterface;
  * @property string $date_creation
  * @property int|null $rating
  * @property int|null $grade
- * @property int|null $avatar_file_id
+ * @property string|null $avatar
  * @property string|null $birthday
  * @property string|null $phone
  * @property string|null $telegram
@@ -61,15 +61,13 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return [
             [['name', 'email', 'password', 'city_id', 'is_executor'], 'required'],
-            [['city_id', 'rating', 'grade', 'avatar_file_id', 'is_executor', 'show_contacts', 'vk_id'], 'integer'],
+            [['city_id', 'rating', 'grade', 'is_executor', 'show_contacts', 'vk_id'], 'integer'],
             [['date_creation', 'birthday'], 'safe'],
-            [['bio', 'status'], 'string'],
+            [['bio', 'status', 'avatar'], 'string'],
             [['name', 'email'], 'string', 'max' => 255],
             [['password', 'telegram'], 'string', 'max' => 64],
             [['phone'], 'string', 'max' => 32],
             [['email'], 'unique'],
-            [['avatar_file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class,
-                'targetAttribute' => ['avatar_file_id' => 'id']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id']],
         ];
@@ -89,7 +87,7 @@ class Users extends ActiveRecord implements IdentityInterface
             'date_creation' => 'Date Creation',
             'rating' => 'Rating',
             'grade' => 'Grade',
-            'avatar_file_id' => 'Avatar File ID',
+            'avatar' => 'Avatar',
             'birthday' => 'Birthday',
             'phone' => 'Phone',
             'telegram' => 'Telegram',
@@ -99,16 +97,6 @@ class Users extends ActiveRecord implements IdentityInterface
             'show_contacts' => 'Show Contacts',
             'vk_id' => 'VK id'
         ];
-    }
-
-    /**
-     * Gets query for [[AvatarFile]].
-     *
-     * @return ActiveQuery
-     */
-    public function getAvatarFile(): ActiveQuery
-    {
-        return $this->hasOne(Files::class, ['id' => 'avatar_file_id']);
     }
 
     /**
@@ -266,9 +254,9 @@ class Users extends ActiveRecord implements IdentityInterface
 
     /** Метод вычисляет оценку исполнителя по отзывам заказчиков
      *
-     * @return float|int
+     * @return float
      */
-    public function getExecutorGrade(): float|int
+    public function getExecutorGrade(): float
     {
         $gradeSum = Feedback::find()
             ->where(['executor_id' => $this->id])
@@ -300,11 +288,11 @@ class Users extends ActiveRecord implements IdentityInterface
 
     /** Метод возвращает id текущего пользователя
      *
-     * @return int|string
+     * @return int
      */
-    public function getId(): int|string
+    public function getId(): int
     {
-        return $this->id;
+        return (int)$this->id;
     }
 
     public function getAuthKey()

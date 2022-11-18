@@ -14,11 +14,6 @@ class CancelAction extends AbstractAction
     public string $class = 'button button--orange action-btn';
     public string $dataAction = 'refusal';
 
-    public function getLink(): ?string
-    {
-        return null;
-    }
-
     public function rightsCheck(Tasks $task, int $userId): bool
     {
         if ($task->status === Tasks::STATUS_AT_WORK && $task->executor_id === $userId) {
@@ -60,5 +55,10 @@ class CancelAction extends AbstractAction
         $task = Tasks::findOne($task);
         $task->status = Tasks::STATUS_CANCELLED;
         $task->update();
+    }
+
+    public function getLink(): ?string
+    {
+        return null;
     }
 }

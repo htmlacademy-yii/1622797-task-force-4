@@ -13,7 +13,6 @@ use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\helpers\HtmlPurifier;
 use app\widgets\ActionsWidget;
 
 $defaultAvatar = '/img/avatars/default-avatar.png';
@@ -21,66 +20,80 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
 
 <div class="left-column">
     <div class="head-wrapper">
-        <h3 class="head-main"><?= HtmlPurifier::process($task->name); ?></h3>
-        <p class="price price--big"><?= HtmlPurifier::process($task->budget); ?> ₽</p>
+        <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
+        <?php if ($task->budget !== null) : ?>
+        <p class="price price--big"><?= Html::encode($task->budget) . ' ₽'; ?></p>
+        <?php endif; ?>
     </div>
-    <p class="task-description"><?= HtmlPurifier::process($task->description); ?></p>
-    <?php if (!$task->checkUserOffers(Yii::$app->user->identity->id)) : ?>
-        <?php foreach ($task->getAvailableActions(Yii::$app->user->identity->id) as $actionObject) : ?>
-            <?= $actionObject !== null ? ActionsWidget::widget(['actionObject' => $actionObject]) : '' ; ?>
+    <p class="task-description"><?= Html::encode($task->description); ?></p>
+        <?php foreach (
+            $task->getAvailableActions(Yii::$app->user->identity->id)
+            as $actionObject
+        ) : ?>
+                                    <?= $actionObject !== null ? ActionsWidget::widget([
+                                            'actionObject' => $actionObject]) : '' ; ?>
         <?php endforeach; ?>
-    <?php endif; ?>
-    <?php if ($task->latitude && $task->longitude) : ?>
+    <?php if ($task->latitude && $task->longitude && $task->address) : ?>
     <div class="task-map">
         <div class="map" style="width: 725px; height: 346px" id="map"></div>
             <script type="text/javascript">
                 ymaps.ready(init);
                 function init(){
                     var myMap = new ymaps.Map("map", {
-                        center: [<?= $task->latitude; ?>, <?= $task->longitude; ?>],
+                        center: [<?= Html::encode($task->latitude); ?>,
+                            <?= Html::encode($task->longitude); ?>],
                         zoom: 14
                     });
                 }
             </script>
-        <input type="hidden" id="latitude" value="<?= HTML::encode($task->latitude); ?>">
-        <input type="hidden" id="longitude" value="<?= HTML::encode($task->longitude); ?>">
-        <p class="map-address town"><?= $task->city->name; ?></p>
-        <p class="map-address"><?= $task->address; ?></p>
+        <input type="hidden" id="latitude" value="<?= Html::encode($task->latitude); ?>">
+        <input type="hidden" id="longitude" value="<?= Html::encode($task->longitude); ?>">
+        <p class="map-address town"></p>
+        <p class="map-address"><?= Html::encode($task->address); ?></p>
     </div>
     <?php endif; ?>
     <?php if ($user->id === $task->customer_id || $user->is_executor === 1) : ?>
     <h4 class="head-regular">Отклики на задание</h4>
         <?php foreach ($task->offers as $response) : ?>
-            <?php if ($user->id === $task->customer_id || $user->id === $response->executor_id) : ?>
+            <?php if (
+                $user->id === $task->customer_id ||
+                    $user->id === $response->executor_id
+            ) : ?>
         <div class="response-card">
             <img class="customer-photo" src="<?=
-            (empty($response->executor->avatarFile->url)) ?
-                $defaultAvatar : $response->executor->avatarFile->url; ?>"
+            Html::encode(empty($response->executor->avatar)) ?
+                            $defaultAvatar : $response->executor->avatar; ?>"
                  width="146" height="156" alt="Фото пользователя">
             <div class="feedback-wrapper">
-                <a href="<?= Url::toRoute(['user/view','id' => $response->executor->id]); ?>"
-                   class="link link--block link--big"><?= HtmlPurifier::process($response->executor->name); ?></a>
+                <a href="<?= Url::to(['user/view','id' => $response->executor->id]); ?>"
+                   class="link link--block link--big"><?= Html::encode(
+                                $response->executor->name
+                            ); ?></a>
                 <div class="response-wrapper">
                     <div class="stars-rating small">
-                        <?= StarsWidget::widget(['grade' => $response->executor->getExecutorGrade()]); ?>
+                        <?= StarsWidget::widget([
+                            'grade' => $response->executor->getExecutorGrade()]); ?>
                     </div>
-                    <p class="reviews"><?= HtmlPurifier::process($response->executor->getFeedbacksCount()); ?>
+                    <p class="reviews"><?= Html::encode(
+                                $response->executor->getFeedbacksCount()
+                            ); ?>
                         <?= MainHelpers::getNounPluralForm(
-                $response->executor->getFeedbacksCount(),
-                'отзыв',
-                'отзыва',
-                'отзывов'
-            ); ?></p>
+                            $response->executor->getFeedbacksCount(),
+                            'отзыв',
+                            'отзыва',
+                            'отзывов'
+                        ); ?></p>
                 </div>
-                <p class="response-message"><?= HtmlPurifier::process($response->comment); ?></p>
+                <p class="response-message"><?= Html::encode($response->comment); ?></p>
             </div>
             <div class="feedback-wrapper">
                 <p class="info-text"><span class="current-time">
                         <?= Yii::$app->formatter->asRelativeTime(
-                            HtmlPurifier::process($response->date_creation)
+                            Html::encode($response->date_creation)
                         ); ?></span></p>
                 <?php if ($response->price !== null) : ?>
-                <p class="price price--small"><?= HtmlPurifier::process($response->price . ' ₽'); ?></p>
+                <p class="price price--small"><?= Html::encode(
+                    $response->price . ' ₽'); ?></p>
                 <?php endif; ?>
             </div>
                 <?php if (
@@ -89,11 +102,12 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
                     $response->task->status === Tasks::STATUS_NEW
                 ) : ?>
             <div class="button-popup">
-                <a href="<?= Url::toRoute(['/tasks/start',
-                    'taskId' => $response->task_id, 'userId' => $response->executor_id]) ?>"
+                <a href="<?= Url::toRoute(['tasks/start',
+                                    'taskId' => $response->task_id,
+                    'userId' => $response->executor_id]) ?>"
                    class="button button--blue button--small">Принять</a>
-                <a href="<?= Url::toRoute(['/tasks/refuse',
-                    'responseId' => $response->id]) ?>"
+                <a href="<?= Url::toRoute(['tasks/refuse',
+                                    'responseId' => $response->id]) ?>"
                    class="button button--orange button--small">Отказать</a>
             </div>
                 <?php endif; ?>
@@ -107,13 +121,15 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
         <h4 class="head-card">Информация о задании</h4>
         <dl class="black-list">
             <dt>Категория</dt>
-            <dd><?= HtmlPurifier::process($task->category->name); ?></dd>
+            <dd><?= Html::encode($task->category->name); ?></dd>
             <dt>Дата публикации</dt>
-            <dd><?= Yii::$app->formatter->asRelativeTime(HtmlPurifier::process($task->date_creation)); ?></dd>
+            <dd><?= Yii::$app->formatter->asRelativeTime(Html::encode($task->date_creation)); ?></dd>
+            <?php if ($task->period_execution) : ?>
             <dt>Срок выполнения</dt>
-            <dd><?=Yii::$app->formatter->asDate(HtmlPurifier::process($task->period_execution)); ?></dd>
+            <dd><?=Yii::$app->formatter->asDate(Html::encode($task->period_execution)); ?></dd>
+            <?php endif; ?>
             <dt>Статус</dt>
-            <dd><?= HtmlPurifier::process($task->getStatusName()); ?></dd>
+            <dd><?= Html::encode($task->getStatusName()); ?></dd>
         </dl>
     </div>
     <div class="right-card white file-card">
@@ -122,20 +138,22 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
             <?php foreach ($task->tasksFiles as $taskFile) : ?>
             <li class="enumeration-item">
                 <?= Html::a(
-                    $taskFile->file->url,
-                    ['tasks/download', 'path' => $taskFile->file->url],
-                    ['class' => 'link link--block link--clip']
-                ); ?>
+                                        $taskFile->file->url,
+                                        ['tasks/download', 'path' => $taskFile->file->url],
+                                        ['class' => 'link link--block link--clip']
+                                    ); ?>
                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
                     filesize(Yii::getAlias(
                         '@webroot/uploads/'
-                    ) . HtmlPurifier::process($taskFile->file->url))
+                    ) . Html::encode($taskFile->file->url))
                 ); ?></p>
             </li>
             <?php endforeach; ?>
         </ul>
     </div>
-    <?php echo $this->render('offers', ['task' => $task, 'newOffers' => $newOffers]); ?>
-    <?php echo $this->render('feedback', ['task' => $task, 'feedbackForm' => $feedbackForm]); ?>
+    <?php echo $this->render('offers', ['task' => $task,
+        'newOffers' => $newOffers]); ?>
+    <?php echo $this->render('feedback', ['task' => $task,
+        'feedbackForm' => $feedbackForm]); ?>
     <?php echo $this->render('cancel', ['task' => $task]); ?>
 </div>

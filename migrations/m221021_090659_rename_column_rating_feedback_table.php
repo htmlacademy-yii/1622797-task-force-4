@@ -24,19 +24,4 @@ class m221021_090659_rename_column_rating_feedback_table extends Migration
 
         return false;
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m221021_090659_rename_column_rating_feedback_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

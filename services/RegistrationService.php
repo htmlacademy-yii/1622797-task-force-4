@@ -2,6 +2,7 @@
 
 namespace app\services;
 
+use app\models\Cities;
 use app\models\forms\RegistrationForm;
 use app\models\Users;
 use Yii;
@@ -21,7 +22,27 @@ class RegistrationService
         $user->city_id = $form->city;
         $user->password = Yii::$app->security->generatePasswordHash($form->password);
         $user->is_executor = $form->isExecutor;
+        $user->show_contacts = 0;
 
         return $user->save(false);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function createVk($userAttributes): Users
+    {
+        $newUser = new Users();
+        $newUser->name = $userAttributes["first_name"] . ' ' . $userAttributes["last_name"];
+        $newUser->email = $userAttributes["email"];
+
+        $city = Cities::findOne(['name' => $userAttributes["city"]['title']]);
+        $newUser->city_id = $city->id;
+
+        $newUser->password = Yii::$app->getSecurity()->generatePasswordHash('password');
+        $newUser->vk_id = $userAttributes["user_id"];
+        $newUser->save();
+
+        return $newUser;
     }
 }

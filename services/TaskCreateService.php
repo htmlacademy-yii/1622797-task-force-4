@@ -2,11 +2,9 @@
 
 namespace app\services;
 
-use app\models\Cities;
 use app\models\forms\TaskCreateForm;
 use app\models\Tasks;
 use Yii;
-use yii\web\NotFoundHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 
@@ -16,7 +14,7 @@ class TaskCreateService
      *
      * @param TaskCreateForm $form
      * @return int|null
-     * @throws ServerErrorHttpException|NotFoundHttpException
+     * @throws ServerErrorHttpException
      */
     public function saveNewTask(TaskCreateForm $form): ?int
     {
@@ -25,18 +23,11 @@ class TaskCreateService
         $task->description = $form->taskDescriptions;
         $task->category_id = $form->category;
         $task->customer_id = Yii::$app->user->identity->id;
-        $task->address = $form->address;
-        $task->latitude = $form->latitude;
-        $task->longitude = $form->longitude;
         $task->budget = $form->budget;
         $task->period_execution = $form->periodExecution;
         $task->latitude = $form->latitude;
         $task->longitude = $form->longitude;
         $task->address = $form->location;
-        if (!$city = Cities::findOne(['name' => $form->city])) {
-            throw new NotFoundHttpException('Данный город не найден в списке');
-        }
-        $task->city_id = $city->id;
         $task->save();
 
         if (!$task->save(false)) {

@@ -31,7 +31,13 @@ use yii\helpers\Url;
                 <?= $form->field($feedbackForm, 'grade', [
                     'template' => '{input}'])->hiddenInput()->label(false); ?>
                 <p class="completion-head control-label">Оценка работы</p>
-                <div class="stars-rating big active-stars"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div>
+                <div class="stars-rating big active-stars">
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                    <span>&nbsp;</span>
+                </div>
 
                 <?= $form->field($feedbackForm, 'taskId', [
                 'template' => '{input}'])

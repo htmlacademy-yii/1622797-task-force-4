@@ -48,11 +48,14 @@ class EditProfileForm extends Model
             [['name', 'email'], 'required'],
             [['name'], 'string'],
             [['email'], 'email'],
-            [['avatar'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg', 'maxSize' => 5 * 1024 * 1024],
-            [['avatar', 'birthday', 'phone', 'telegram', 'bio', 'category'], 'default', 'value' => null],
+            [['avatar'], 'file', 'skipOnEmpty' => true,
+                'extensions' => 'png, jpg, jpeg', 'maxSize' => 5 * 1024 * 1024],
+            [['avatar', 'birthday', 'phone', 'telegram', 'bio', 'category'],
+                'default', 'value' => null],
             [['phone'], 'match', 'pattern' => '/^[\d]{11}/i'],
             [['telegram'], 'string', 'max' => 64],
-            [['telegram'], 'match', 'pattern' => '/^@\w*$/i', 'message' => 'Телеграм должен начинаться со знака @'],
+            [['telegram'], 'match', 'pattern' => '/^@\w*$/i',
+                'message' => 'Телеграм должен начинаться со знака @'],
             [['bio'], 'string', 'max' => 2000],
             ['showContacts', 'boolean']
         ];
@@ -66,11 +69,6 @@ class EditProfileForm extends Model
     public function setUser(): void
     {
         $user = Users::findOne(Yii::$app->user->getId());
-
-        if (!$this->uploadAvatar() && $this->avatar) {
-            throw new ServerErrorHttpException('Загрузить файл не удалось');
-        }
-
         $user->name = $this->name;
         $user->email = $this->email;
         $user->birthday = $this->birthday;
@@ -78,45 +76,43 @@ class EditProfileForm extends Model
         $user->telegram = $this->telegram;
         $user->bio = $this->bio;
 
-        if (!empty($user->executorCategories)) {
-            $this->loadUserCategory();
-        }
-        $user->show_contacts = $this->showContacts;
+        if ($this->avatar) {
+            $path = '/uploads/avatar/' . uniqid('avatar') . '.' . $this->avatar->getExtension();
 
-        $user->save();
+            if ($this->uploadAvatar($path)) {
+                $user->avatar = $path;
+            }
+        }
+
+        if ($this->category) {
+            ExecutorCategory::deleteExecutorCategories();
+
+            foreach ($this->category as $category) {
+                $userCategory = new ExecutorCategory();
+                $userCategory->user_id = Yii::$app->user->getId();
+                $userCategory->category_id = $category;
+                $userCategory->save(false);
+            }
+        }
+
+        if (!empty($user->showContacts)) {
+            $user->show_contacts = $this->showContacts;
+        }
+
+        $user->save(false);
     }
 
     /**
+     * @param string $path
      * @return bool
-     * @throws ServerErrorHttpException
      */
-    public function uploadAvatar(): bool
+    public function uploadAvatar(string $path): bool
     {
-        if ($this->validate() && $this->avatar) {
-            $avatarName = uniqid('avatar') . '.' . $this->avatar->getExtension();
+        if ($this->validate()) {
+            $this->avatar->saveAs('@webroot' . $path);
 
-            if (!$this->avatar->saveAs('@webroot/uploads/avatar' . $avatarName)) {
-                throw new ServerErrorHttpException('Ошибка загрузки аватара');
-            }
             return true;
         }
         return false;
-    }
-
-    /** Метод загружает категории пользователя
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function loadUserCategory(): void
-    {
-        ExecutorCategory::deleteExecutorCategories();
-
-        foreach ($this->category as $category) {
-            $userCategory = new ExecutorCategory();
-            $userCategory->user_id = Yii::$app->user->getId();
-            $userCategory->category_id = $category;
-            $userCategory->save();
-        }
     }
 }

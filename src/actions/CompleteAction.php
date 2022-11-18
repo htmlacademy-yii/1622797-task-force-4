@@ -11,16 +11,16 @@ class CompleteAction extends AbstractAction
     public string $class = 'button button--pink action-btn';
     public string $dataAction = 'completion';
 
-    public function getLink(): ?string
-    {
-        return null;
-    }
-
     public function rightsCheck(Tasks $task, int $userId): bool
     {
         if ($task->status === Tasks::STATUS_AT_WORK && $task->customer_id === $userId) {
             return true;
         }
         return false;
+    }
+
+    public function getLink(): ?string
+    {
+        return null;
     }
 }

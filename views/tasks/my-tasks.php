@@ -6,8 +6,8 @@
  */
 
 use app\models\Tasks;
-use yii\helpers\HtmlPurifier;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\widgets\ListView;
 use yii\widgets\Menu;
 
@@ -42,7 +42,7 @@ $executor = Yii::$app->user->identity->is_executor === 1;
     ?>
 </div>
 <div class="left-column left-column--task">
-    <h3 class="head-main head-regular"><?= HtmlPurifier::process(
+    <h3 class="head-main head-regular"><?= Html::encode(
     ArrayHelper::getValue(Tasks::getStatusesLabels(), $status)); ?></h3>
     <div class="pagination-wrapper">
         <?= ListView::widget([
