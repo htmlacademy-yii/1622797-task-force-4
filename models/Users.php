@@ -314,4 +314,14 @@ class Users extends ActiveRecord implements IdentityInterface
     {
         return Yii::$app->security->validatePassword($password, $this->password);
     }
+
+    /** Метод проверяет оставлял ли исполнитель отклик к конкурентому заданию или нет
+     *
+     * @param $id
+     * @return bool
+     */
+    public function checkUserOffers($id): bool
+    {
+        return (bool) Offers::findOne(['task_id' => $id, 'executor_id' => $this->id]);
+    }
 }

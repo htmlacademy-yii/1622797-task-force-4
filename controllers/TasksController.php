@@ -159,23 +159,21 @@ class TasksController extends SecuredController
     public function actionStart($taskId, $userId): Response
     {
         $task = Tasks::findOne($taskId);
-        $task->status = Tasks::STATUS_AT_WORK;
-        $task->executor_id = $userId;
-        $task->save(false);
+        $task->startTask($userId);
 
         return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отказа исполнителю в участии в Задании
      *
+     * @param $taskId
      * @param $responseId
      * @return Response
      */
-    public function actionRefuse($responseId): Response
+    public function actionRefuse($taskId, $responseId): Response
     {
-        $offers = Offers::findOne($responseId);
-        $offers->refuse = 1;
-        $offers->save();
+        $task = Tasks::findOne($taskId);
+        $task->refuseExecutor($responseId);
 
         return $this->redirect(Yii::$app->request->referrer);
     }
@@ -220,7 +218,7 @@ class TasksController extends SecuredController
         return $this->redirect('/tasks');
     }
 
-    /** Метод отменяет Задание
+    /** Метод отменяет Задание создателем и переводит все отзывы в статус Отказано
      *
      * @param $id
      * @return Response
@@ -229,34 +227,23 @@ class TasksController extends SecuredController
     public function actionRemove($id): Response
     {
         $task = Tasks::findOne($id);
-        $action = new CancelAction();
+        $task->removeTask();
 
-        if ($action->rightsCheckCustomer($task, Yii::$app->user->identity->id)) {
-            $action->removeTask($id);
-
-            return $this->redirect(Yii::$app->request->referrer);
-        }
-        return $this->redirect('/tasks');
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отказа от Задания исполнителем
      *
      * @param $id
      * @return Response
-     * @throws StaleObjectException
      * @throws Throwable
      */
     public function actionCancel($id): Response
     {
         $task = Tasks::findOne($id);
-        $action = new CancelAction();
+        $task->cancelTask();
 
-        if ($action->rightsCheck($task, Yii::$app->user->getId())) {
-            $action->cancelTask($id);
-
-            return $this->redirect(Yii::$app->request->referrer);
-        }
-        return $this->redirect('/tasks');
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отвечает за отрисовку страницы Мои задания

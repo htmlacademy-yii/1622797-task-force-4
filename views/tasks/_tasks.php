@@ -13,9 +13,7 @@ use yii\helpers\Url;
     <div class="header-task">
         <a  href="<?= Url::to(['tasks/view/', 'id' => $model->id]); ?>"
             class="link link--block link--big"><?= Html::encode($model->name); ?></a>
-        <?php if ($model->budget !== null) : ?>
-        <p class="price price--task"><?= Html::encode($model->budget) . ' ₽'; ?></p>
-        <?php endif; ?>
+        <p class="price price--task"><?= $model->budget ? Html::encode($model->budget) . ' ₽' : 'Договорная'; ?></p>
     </div>
     <p class="info-text"><span class="current-time"><?= Yii::$app->formatter
                 ->format(

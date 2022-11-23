@@ -13,7 +13,6 @@ use app\widgets\StarsWidget;
 use taskforce\helpers\MainHelpers;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use app\widgets\ActionsWidget;
 
 $defaultAvatar = '/img/avatars/default-avatar.png';
 ?>
@@ -21,18 +20,25 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
 <div class="left-column">
     <div class="head-wrapper">
         <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
-        <?php if ($task->budget !== null) : ?>
-        <p class="price price--big"><?= Html::encode($task->budget) . ' ₽'; ?></p>
-        <?php endif; ?>
+        <p class="price price--big"><?= $task->budget ? Html::encode($task->budget) . ' ₽' : 'Договорная'; ?></p>
     </div>
     <p class="task-description"><?= Html::encode($task->description); ?></p>
-        <?php foreach (
-            $task->getAvailableActions(Yii::$app->user->identity->id)
-            as $actionObject
-        ) : ?>
-                                    <?= $actionObject !== null ? ActionsWidget::widget([
-                                            'actionObject' => $actionObject]) : '' ; ?>
-        <?php endforeach; ?>
+    <?php if (
+        $task->status === Tasks::STATUS_NEW &&
+            Yii::$app->user->identity->is_executor === 1 &&
+            !Yii::$app->user->identity->checkUserOffers($task->id)
+    ) : ?>
+        <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
+    <?php endif; ?>
+    <?php if ($task->status === Tasks::STATUS_AT_WORK && $task->executor_id === Yii::$app->user->id) : ?>
+        <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
+    <?php endif; ?>
+    <?php if ($task->status === Tasks::STATUS_AT_WORK && $task->customer_id === Yii::$app->user->id) : ?>
+        <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+    <?php endif; ?>
+    <?php if ($task->status === Tasks::STATUS_NEW && $task->customer_id === Yii::$app->user->id) : ?>
+        <a href="#" class="button button--pink action-btn" data-action="cancel">Отменить задание</a>
+    <?php endif; ?>
     <?php if ($task->latitude && $task->longitude && $task->address) : ?>
     <div class="task-map">
         <div class="map" style="width: 725px; height: 346px" id="map"></div>
@@ -61,14 +67,14 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
             ) : ?>
         <div class="response-card">
             <img class="customer-photo" src="<?=
-            Html::encode(empty($response->executor->avatar)) ?
-                            $defaultAvatar : $response->executor->avatar; ?>"
+                        Html::encode(empty($response->executor->avatar)) ?
+                                        $defaultAvatar : $response->executor->avatar; ?>"
                  width="146" height="156" alt="Фото пользователя">
             <div class="feedback-wrapper">
                 <a href="<?= Url::to(['user/view','id' => $response->executor->id]); ?>"
                    class="link link--block link--big"><?= Html::encode(
-                                $response->executor->name
-                            ); ?></a>
+                                            $response->executor->name
+                                        ); ?></a>
                 <div class="response-wrapper">
                     <div class="stars-rating small">
                         <?= StarsWidget::widget([
@@ -78,11 +84,11 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
                                 $response->executor->getFeedbacksCount()
                             ); ?>
                         <?= MainHelpers::getNounPluralForm(
-                            $response->executor->getFeedbacksCount(),
-                            'отзыв',
-                            'отзыва',
-                            'отзывов'
-                        ); ?></p>
+                        $response->executor->getFeedbacksCount(),
+                        'отзыв',
+                        'отзыва',
+                        'отзывов'
+                    ); ?></p>
                 </div>
                 <p class="response-message"><?= Html::encode($response->comment); ?></p>
             </div>
@@ -93,7 +99,8 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
                         ); ?></span></p>
                 <?php if ($response->price !== null) : ?>
                 <p class="price price--small"><?= Html::encode(
-                    $response->price . ' ₽'); ?></p>
+                            $response->price . ' ₽'
+                        ); ?></p>
                 <?php endif; ?>
             </div>
                 <?php if (
@@ -103,11 +110,11 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
                 ) : ?>
             <div class="button-popup">
                 <a href="<?= Url::toRoute(['tasks/start',
-                                    'taskId' => $response->task_id,
-                    'userId' => $response->executor_id]) ?>"
+                                                    'taskId' => $response->task_id,
+                                    'userId' => $response->executor_id]) ?>"
                    class="button button--blue button--small">Принять</a>
-                <a href="<?= Url::toRoute(['tasks/refuse',
-                                    'responseId' => $response->id]) ?>"
+                <a href="<?= Url::toRoute(['tasks/refuse', 'taskId' => $response->task_id,
+                                                    'responseId' => $response->id]) ?>"
                    class="button button--orange button--small">Отказать</a>
             </div>
                 <?php endif; ?>
@@ -138,10 +145,10 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
             <?php foreach ($task->tasksFiles as $taskFile) : ?>
             <li class="enumeration-item">
                 <?= Html::a(
-                                        $taskFile->file->url,
-                                        ['tasks/download', 'path' => $taskFile->file->url],
-                                        ['class' => 'link link--block link--clip']
-                                    ); ?>
+                                                        $taskFile->file->url,
+                                                        ['tasks/download', 'path' => $taskFile->file->url],
+                                                        ['class' => 'link link--block link--clip']
+                                                    ); ?>
                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
                     filesize(Yii::getAlias(
                         '@webroot/uploads/'
@@ -156,4 +163,5 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
     <?php echo $this->render('feedback', ['task' => $task,
         'feedbackForm' => $feedbackForm]); ?>
     <?php echo $this->render('cancel', ['task' => $task]); ?>
+    <?php echo $this->render('remove', ['task' => $task]); ?>
 </div>
