@@ -24,19 +24,4 @@ class m221031_220740_alter_column_period_execution_tasks_table extends Migration
 
         return false;
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m221031_220740_alter_column_period_execution_tasks_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

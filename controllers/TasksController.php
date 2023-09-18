@@ -21,6 +21,35 @@ use yii\web\ServerErrorHttpException;
 
 class TasksController extends SecuredController
 {
+    /**
+     * @return array|array[]
+     */
+    public function behaviors(): array
+    {
+        $rules = parent::behaviors();
+        $rule = [
+            'allow' => false,
+            'actions' => ['create', 'feedback', 'refuse', 'start', 'remove'],
+            'matchCallback' => function ($rule, $action) {
+                $isCustomer = Yii::$app->user->getIdentity()->is_executor === 0;
+                return empty($isCustomer);
+            }
+        ];
+        $ruleOffer = [
+            'allow' => false,
+            'actions' => ['offers', 'cancel'],
+            'matchCallback' => function ($rule, $action) {
+                $isExecutor = Yii::$app->user->getIdentity()->is_executor === 1;
+                return empty($isExecutor);
+            }
+        ];
+
+        array_unshift($rules['access']['rules'], $ruleOffer);
+        array_unshift($rules['access']['rules'], $rule);
+
+        return $rules;
+    }
+
     /** Метод отвечает за показ страницы с Заданиями
      *
      * @return string
@@ -100,7 +129,6 @@ class TasksController extends SecuredController
                 $taskCreateForm->latitude = $geocoder->getLatitude($taskCreateForm->location);
                 $taskCreateForm->longitude = $geocoder->getLongitude($taskCreateForm->location);
                 $taskCreateForm->location = $geocoder->getAddress($taskCreateForm->location);
-                $taskCreateForm->city = $geocoder->getCity($taskCreateForm->location);
 
                 $createdTask = new TaskCreateService();
                 $taskId = $createdTask->saveNewTask($taskCreateForm);
@@ -121,33 +149,31 @@ class TasksController extends SecuredController
         return Yii::$app->response->sendFile(Yii::getAlias('@webroot/uploads/') . $path)->send();
     }
 
-    /**
+    /** Метод назначает исполнителя для Задания
+     *
      * @param $taskId
      * @param $userId
      * @return Response
      * @throws Throwable
-     * @throws StaleObjectException
      */
     public function actionStart($taskId, $userId): Response
     {
         $task = Tasks::findOne($taskId);
-        $task->status = Tasks::STATUS_AT_WORK;
-        $task->executor_id = $userId;
-        $task->update();
+        $task->startTask($userId);
 
         return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отказа исполнителю в участии в Задании
      *
+     * @param $taskId
      * @param $responseId
      * @return Response
      */
-    public function actionRefuse($responseId): Response
+    public function actionRefuse($taskId, $responseId): Response
     {
-        $offers = Offers::findOne($responseId);
-        $offers->refuse = 1;
-        $offers->save();
+        $task = Tasks::findOne($taskId);
+        $task->refuseExecutor($responseId);
 
         return $this->redirect(Yii::$app->request->referrer);
     }
@@ -172,7 +198,8 @@ class TasksController extends SecuredController
         return $this->redirect('/tasks');
     }
 
-    /**
+    /** Метод оставляет отзыв о работе исполнителя и завершает задание
+     *
      * @return Response
      */
     public function actionFeedback(): Response
@@ -191,7 +218,8 @@ class TasksController extends SecuredController
         return $this->redirect('/tasks');
     }
 
-    /**
+    /** Метод отменяет Задание создателем и переводит все отзывы в статус Отказано
+     *
      * @param $id
      * @return Response
      * @throws Throwable
@@ -199,56 +227,48 @@ class TasksController extends SecuredController
     public function actionRemove($id): Response
     {
         $task = Tasks::findOne($id);
-        $action = new CancelAction();
+        $task->removeTask();
 
-        if ($action->rightsCheckCustomer($task, Yii::$app->user->identity->id)) {
-            $action->removeTask($id);
-
-            return $this->redirect(Yii::$app->request->referrer);
-        }
-        return $this->redirect('/tasks');
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
-    /**
+    /** Метод отказа от Задания исполнителем
+     *
      * @param $id
      * @return Response
-     * @throws StaleObjectException
      * @throws Throwable
      */
     public function actionCancel($id): Response
     {
         $task = Tasks::findOne($id);
-        $action = new CancelAction();
+        $task->cancelTask();
 
-        if ($action->rightsCheck($task, Yii::$app->user->getId())) {
-            $action->cancelTask($id);
-
-            return $this->redirect(Yii::$app->request->referrer);
-        }
-        return $this->redirect('/tasks');
+        return $this->redirect(Yii::$app->request->referrer);
     }
 
     /** Метод отвечает за отрисовку страницы Мои задания
      *
      * @param string $status
      * @return string
+     * @throws Throwable
      */
     public function actionMyTasks(string $status): string
     {
-        $user = Yii::$app->user->getId();
-        $taskQuery = new Tasks();
+        $userId = Yii::$app->user->getIdentity();
+        $task = new Tasks();
+        $taskQuery = Tasks::find();
 
         if ($status === Tasks::STATUS_NEW) {
-            $taskQuery->getNewCustomerTasks($user);
+            $taskQuery = $task->getNewCustomerTasks($userId);
         }
         if ($status === Tasks::STATUS_AT_WORK) {
-            $taskQuery->getInWorkTasks($user);
+            $taskQuery = $task->getInWorkTasks($userId);
         }
         if ($status === Tasks::STATUS_DONE) {
-            $taskQuery->getDoneTasks($user);
+            $taskQuery = $task->getDoneTasks($userId);
         }
         if ($status === Tasks::STATUS_FAILED) {
-            $taskQuery->getDeadlineExecutorTasks($user);
+            $taskQuery = $task->getDeadlineExecutorTasks($userId);
         }
 
         $dataProvider = new ActiveDataProvider([

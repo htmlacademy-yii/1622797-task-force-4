@@ -47,8 +47,10 @@ $categoryItems = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
                     'class' => 'control-label'],
                 'inputOptions' => ['id' => 'location']])
                 ->textInput(['class' => 'location-icon']); ?>
-            <?= $form->field($taskCreateForm, 'latitude', ['template' => '{input}'])->hiddenInput(); ?>
-            <?= $form->field($taskCreateForm, 'longitude', ['template' => '{input}'])->hiddenInput(); ?>
+            <?= $form->field($taskCreateForm, 'latitude',
+                ['template' => '{input}'])->hiddenInput(); ?>
+            <?= $form->field($taskCreateForm, 'longitude',
+                ['template' => '{input}'])->hiddenInput(); ?>
         </div>
         <div class="half-wrapper">
             <div class="form-group">

@@ -4,8 +4,10 @@ namespace app\controllers;
 
 use app\models\Cities;
 use app\models\Users;
+use app\services\RegistrationService;
 use Throwable;
 use Yii;
+use yii\base\Exception;
 use yii\web\Response;
 use app\models\forms\LoginForm;
 use yii\widgets\ActiveForm;
@@ -65,12 +67,18 @@ class LandingController extends NotSecuredController
         return $this->redirect('/');
     }
 
-    public function actionAuth()
+    /**
+     * @return void
+     */
+    public function actionAuth(): void
     {
         $url = Yii::$app->authClientCollection->getClient("vkontakte")->buildAuthUrl();
         Yii::$app->getResponse()->redirect($url);
     }
 
+    /**
+     * @throws Exception
+     */
     public function actionVk(): Response
     {
         $code = Yii::$app->request->get('code');
@@ -83,18 +91,8 @@ class LandingController extends NotSecuredController
             Yii::$app->user->login($user);
             return $this->redirect('/tasks');
         }
-        $newUser = new Users();
-        $newUser->name = $userAttributes["first_name"] . ' ' . $userAttributes["last_name"];
-        $newUser->email = $userAttributes["email"];
-
-        $city = Cities::findOne(['name' => $userAttributes["city"]['title']]);
-        $newUser->city_id = $city->id;
-
-        $newUser->is_executor = 0;
-        $newUser->show_contacts = 0;
-        $newUser->password = 'asasas';
-        $newUser->vk_id = $userAttributes["user_id"];
-        $newUser->save();
+        $service = new RegistrationService();
+        $newUser = $service->createVk($userAttributes);
         Yii::$app->user->login($newUser);
         return $this->redirect('/tasks');
     }

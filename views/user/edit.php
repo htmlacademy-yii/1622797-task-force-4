@@ -24,13 +24,13 @@ $defaultAvatar = '/img/avatars/default-avatar.png';
     <div class="my-profile-form">
         <?php $form = ActiveForm::begin([
             'method' => 'post',
-            'action' => Url::toRoute('user/edit')]); ?>
+            'action' => Url::to('user/edit')]); ?>
             <h3 class="head-main head-regular">Мой профиль</h3>
             <div class="photo-editing">
                 <div>
                     <p class="form-label">Аватар</p>
-                    <img class="avatar-preview" src="<?= (empty($user->avatarFile->url)) ?
-                        $defaultAvatar : $user->avatarFile->url; ?>" width="83" height="83">
+                    <img class="avatar-preview" src="<?= Html::encode(empty($user->avatar)) ?
+                        $defaultAvatar : $user->avatar; ?>" width="83" height="83">
                 </div>
                 <?= $form->field($editProfileForm, 'avatar', [
                     'template' => "<label class=\"button button--black\">Сменить аватар{input}",

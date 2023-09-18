@@ -28,8 +28,10 @@ use app\models\forms\LoginForm;
         'baseAuthUrl' => ['landing/auth'],
         'popupMode' => false,
     ]); ?>
+    <p>
     <?php foreach ($authAuthChoice->getClients() as $client) : ?>
         <?= $authAuthChoice->clientLink($client, "Войти через {$client->getTitle()}") ?>
     <?php endforeach; ?>
     <?php AuthChoice::end(); ?>
+    </p>
     </section>

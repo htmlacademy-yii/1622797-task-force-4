@@ -5,8 +5,11 @@ namespace app\models;
 use taskforce\actions\CancelAction;
 use taskforce\actions\CompleteAction;
 use taskforce\actions\OffersAction;
+use Throwable;
+use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\StaleObjectException;
 
 /**
  * This is the model class for table "tasks".
@@ -56,18 +59,25 @@ class Tasks extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'category_id', 'customer_id', 'status', 'budget', 'period_execution'], 'required'],
-            [['description', 'status', 'address', 'latitude', 'longitude'], 'string'],
-            [['city_id', 'category_id', 'customer_id', 'executor_id', 'budget'], 'integer'],
+            [['name', 'category_id', 'customer_id', 'status', 'budget',
+                'period_execution'], 'required'],
+            [['description', 'status', 'address', 'latitude',
+                'longitude'], 'string'],
+            [['city_id', 'category_id', 'customer_id', 'executor_id',
+                'budget'], 'integer'],
             [['date_creation', 'period_execution'], 'safe'],
             [['name'], 'string', 'max' => 255],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
+            [['customer_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['customer_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class,
+            [['executor_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class,
+            [['category_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class,
+            [['city_id'], 'exist', 'skipOnError' => true,
+                'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id']],
         ];
     }
@@ -191,52 +201,6 @@ class Tasks extends ActiveRecord
         return $statusList[$this->status];
     }
 
-    /** Функция для получения доступных действия для указанного статуса задания
-     *
-     * @param int $userId
-     * @return array возвращает статус задания в зависимости от роли пользователя
-     */
-    public function getAvailableActions(int $userId): array
-    {
-        $user = Users::findOne($userId);
-        switch ($this->status) {
-            case self::STATUS_NEW:
-                if ($userId === $this->customer_id) {
-                    return [new CancelAction()];
-                } elseif ($user->is_executor === 1) {
-                    return [new OffersAction()];
-                }
-                break;
-
-            case self::STATUS_AT_WORK:
-                if ($userId === $this->customer_id) {
-                    return [new CompleteAction()];
-                } elseif ($userId === $this->executor_id) {
-                    return [new CancelAction()];
-                }
-                break;
-        }
-        return [];
-    }
-
-    /** Метод проверяет оставлял ли исполнитель отклик к конкурентому заданию или нет
-     *
-     * @param $id
-     * @return bool
-     */
-    public function checkUserOffers($id): bool
-    {
-        if (
-            Offers::find()->where([
-            'task_id' => $this->id,
-            'executor_id' => $id])
-            ->one()
-        ) {
-            return true;
-        }
-        return false;
-    }
-
     /** Метод получает название категорий заданий для пользователей
      *
      * @return string[]
@@ -259,7 +223,8 @@ class Tasks extends ActiveRecord
     public function getNewCustomerTasks($userId): ActiveQuery
     {
         $tasksQuery = Tasks::find();
-        return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_NEW]);
+        return $tasksQuery->where(['customer_id' => $userId])
+            ->andWhere(['status' => Tasks::STATUS_NEW]);
     }
 
     /** Метод получает все задачи в работе в Исполнителя или Заказчика
@@ -271,9 +236,11 @@ class Tasks extends ActiveRecord
     {
         $tasksQuery = Tasks::find();
         if ($userId->is_executor !== 1) {
-            return $tasksQuery->where(['customer_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+            return $tasksQuery->where(['customer_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_AT_WORK]);
         } else {
-            return $tasksQuery->where(['executor_id' => $userId])->andWhere(['status' => Tasks::STATUS_AT_WORK]);
+            return $tasksQuery->where(['executor_id' => $userId])
+                ->andWhere(['status' => Tasks::STATUS_AT_WORK]);
         }
     }
 
@@ -287,11 +254,11 @@ class Tasks extends ActiveRecord
         $tasksQuery = Tasks::find();
         if ($userId->is_executor !== 1) {
             return $tasksQuery->where(['customer_id' => $userId])
-                ->andWhere(['status' => Tasks::STATUS_FAILED, Tasks::STATUS_DONE,
-                    Tasks::STATUS_CANCELLED]);
+                ->andWhere(['status' => [Tasks::STATUS_FAILED, Tasks::STATUS_DONE,
+                    Tasks::STATUS_CANCELLED]]);
         } else {
             return $tasksQuery->where(['executor_id' => $userId])
-                ->andWhere(['status' => Tasks::STATUS_DONE, Tasks::STATUS_FAILED]);
+                ->andWhere(['status' => [Tasks::STATUS_DONE, Tasks::STATUS_FAILED]]);
         }
     }
 
@@ -303,6 +270,77 @@ class Tasks extends ActiveRecord
     public function getDeadlineExecutorTasks($userId): ActiveQuery
     {
         $tasksQuery = Tasks::find();
-        return $tasksQuery->where(['executor_id' => $userId])->andWhere(['period_execution' < 'NOW()']);
+        return $tasksQuery->where(['executor_id' => $userId])
+            ->andWhere(['period_execution' => '< NOW()']);
+    }
+
+    /** Метод выполняет действие по Отмене задание его создателем
+     *
+     * @return bool
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
+    public function removeTask(): bool
+    {
+        if ($this->customer_id !== Yii::$app->user->id || $this->status !== self::STATUS_NEW) {
+            return false;
+        }
+
+        $this->status = self::STATUS_CANCELLED;
+        $this->update(false);
+
+        return true;
+    }
+
+    /** Метод выполняет действие по Отказу от выполнения задания исполнителем
+     *
+     * @return bool
+     * @throws StaleObjectException
+     * @throws Throwable
+     */
+    public function cancelTask(): bool
+    {
+        if ($this->executor_id !== Yii::$app->user->id || $this->status !== self::STATUS_AT_WORK) {
+            return false;
+        }
+
+        $this->status = self::STATUS_FAILED;
+        return $this->update(false);
+    }
+
+    /** Метод выполняет действие по назначению исполнителя и старта задания
+     *
+     * @param $userId
+     * @return bool
+     */
+    public function startTask($userId): bool
+    {
+        if ($this->customer_id !== Yii::$app->user->id) {
+            return false;
+        }
+
+        $this->status = self::STATUS_AT_WORK;
+        $this->executor_id = $userId;
+        $this->save(false);
+
+        return true;
+    }
+
+    /** Метод выполняет действие по отказу исполнителю в выполнении задания
+     *
+     * @param $responseId
+     * @return bool
+     */
+    public function refuseExecutor($responseId): bool
+    {
+        if ($this->customer_id !== Yii::$app->user->id) {
+            return false;
+        }
+
+        $offers = Offers::findOne($responseId);
+        $offers->refuse = 1;
+        $offers->save();
+
+        return true;
     }
 }

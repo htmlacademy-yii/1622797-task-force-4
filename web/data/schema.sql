@@ -26,7 +26,7 @@ CREATE TABLE users (
   date_creation DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   rating TINYINT DEFAULT 0,
   grade FLOAT DEFAULT 0,
-  avatar_file_id int NULL,
+  avatar VARCHAR(255) NULL,
   birthday DATETIME,
   phone VARCHAR(32),
   telegram VARCHAR(64),
@@ -35,7 +35,6 @@ CREATE TABLE users (
   is_executor BOOLEAN NOT NULL,
   show_contacts BOOLEAN NOT NULL,
   vk_id int
-  FOREIGN KEY (avatar_file_id) REFERENCES files (id),
   FOREIGN KEY  (city_id) REFERENCES cities (id)
 );
 
